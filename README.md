@@ -5,13 +5,13 @@
 4. Discord server (the bot has to be inside the server)
 #### Script Code (Roblox):
 ```lua
-local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/SxnwDev/Premier-V3/main/UI.lua"))()
+local UI = loadstring(game:HttpGet("https://raw.githubusercontent.com/SxnwDev/Premier-V3/main/UI.lua"))()
 
-library.Discord.Token = '' -- Discord bot Token
-library.Discord.Server = '' -- Discord server ID
-library.MongoDB.API_TOKEN = '' -- MongoDB Token
+UI.Discord.Token = '' -- Discord bot Token
+UI.Discord.Server = '' -- Discord server ID
+UI.MongoDB.API_TOKEN = '' -- MongoDB Token
 
-local window = library.new()
+local window = UI.Library.new()
 
 -- script content
 
