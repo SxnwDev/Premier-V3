@@ -2251,4 +2251,4 @@ do
 	end
 end
 
-return { library, Discord, MongoDB }
+return { Library = library, Discord = Discord, MongoDB = MongoDB }
