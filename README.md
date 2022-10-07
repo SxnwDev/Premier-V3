@@ -10,6 +10,7 @@ local UI = loadstring(game:HttpGet("https://raw.githubusercontent.com/SxnwDev/Pr
 UI.Discord.Token = '' -- Discord bot Token
 UI.Discord.Server = '' -- Discord server ID
 UI.MongoDB.API_TOKEN = '' -- MongoDB Token
+UI.MongoDB.URL_ENDPOINT = '' -- MongoDB URL EndPoint
 
 local window = UI.Library.new()
 
