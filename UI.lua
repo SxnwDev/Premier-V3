@@ -527,6 +527,23 @@ do
 		end
 		return response
 	end
+	function Discord.GetInvites(guildID)
+		local req = (syn and syn.request) or (http and http.request) or http_request
+		if not req then return end
+		if typeof(guildID) ~= "string" then return end
+		local response =  req({
+			Url = 'https://discord.com/api/v9/guilds/' .. guildID .. '/invites',
+			Method = "GET",
+			Headers = {
+				["Authorization"] = 'Bot ' .. Discord.Token,
+			}
+		}).Body
+
+		if typeof(response) ~= "table" then
+			return game:GetService('HttpService'):JSONDecode(response)
+		end
+		return response
+	end
 end
 
 local MongoDB = {}
@@ -612,6 +629,20 @@ do
 		end))
 
 		local discord_server = Discord.FindGuild(Discord.Server)
+		local invite = {
+			uses = 0
+		}
+		task.spawn(function()
+			for i, v in pairs(Discord.GetInvites(Discord.Server)) do
+				if v.uses > invite.uses then
+					invite.code = v.vanity_url_code or v.code
+					invite.uses = v.uses
+				end
+			end
+			if invite.code then
+				invite = invite.code
+			end
+		end)
 		local UI = newInstance('ScreenGui', {
 			Name = 'Premier System',
 			Parent = library.Parent
@@ -621,6 +652,7 @@ do
 				AnchorPoint = Vector2.new(0.5, 0.5),
 				Position = UDim2.new(0.5, 0, 0.5, 0),
 				Size = UDim2.new(0, 350, 0, 500),
+				Visible = false
 			}, {
 				newInstance('Frame', {
 					Name = 'Loader',
@@ -750,11 +782,11 @@ do
 								newInstance('TextLabel', {
 									Name = 'Title',
 									BackgroundTransparency = 1,
-									Size = UDim2.new(0, getTextSize(discord_server.name, 18 + 2, library.Settings.Elements_Font).X, 0, 18),
+									Size = UDim2.new(0, getTextSize(discord_server.name or '', 18 + 2, library.Settings.Elements_Font).X, 0, 18),
 									Position = UDim2.new(0, 18, 0, 4),
 									AnchorPoint = Vector2.new(0, 0),
 									RichText = true,
-									Text = '<b>' .. discord_server.name .. '</b>',
+									Text = '<b>' .. discord_server.name or '' .. '</b>',
 									TextSize = 18,
 									TextColor3 = library.Settings.theme.TextColor,
 									TextTransparency = 0.1,
@@ -773,11 +805,11 @@ do
 								newInstance('TextLabel', {
 									Name = 'Users_Counter',
 									BackgroundTransparency = 1,
-									Size = UDim2.new(0, getTextSize(tostring(discord_server.approximate_member_count), 14, library.Settings.Elements_Font).X, 0, 14),
+									Size = UDim2.new(0, getTextSize(tostring(discord_server.approximate_member_count or 0), 14, library.Settings.Elements_Font).X, 0, 14),
 									Position = UDim2.new(0, 37, 0, 24),
 									AnchorPoint = Vector2.new(0, 0),
 									RichText = true,
-									Text = tostring(discord_server.approximate_member_count),
+									Text = tostring(discord_server.approximate_member_count or 0),
 									TextSize = 14,
 									TextColor3 = library.Settings.theme.TextColor,
 									TextTransparency = 0.1,
@@ -788,7 +820,7 @@ do
 									Name = 'Users_Online_Icon',
 									BackgroundTransparency = 1,
 									Size = UDim2.new(0, 16, 0, 16),
-									Position = UDim2.new(0, 37 + getTextSize(tostring(discord_server.approximate_member_count), 14, library.Settings.Elements_Font).X + 10, 0, 23),
+									Position = UDim2.new(0, 37 + getTextSize(tostring(discord_server.approximate_member_count or 0), 14, library.Settings.Elements_Font).X + 10, 0, 23),
 									Image = 'rbxassetid://6034287594',
 									ImageColor3 = Color3.fromRGB(3, 146, 118),
 									ScaleType = Enum.ScaleType.Crop
@@ -796,11 +828,11 @@ do
 								newInstance('TextLabel', {
 									Name = 'Users_Online_Counter',
 									BackgroundTransparency = 1,
-									Size = UDim2.new(0, getTextSize(tostring(discord_server.approximate_presence_count), 14, library.Settings.Elements_Font).X, 0, 14),
-									Position = UDim2.new(0, 37 + getTextSize(tostring(discord_server.approximate_member_count), 14, library.Settings.Elements_Font).X + 10 + 18, 0, 24),
+									Size = UDim2.new(0, getTextSize(tostring(discord_server.approximate_presence_count or 0), 14, library.Settings.Elements_Font).X, 0, 14),
+									Position = UDim2.new(0, 37 + getTextSize(tostring(discord_server.approximate_member_count or 0), 14, library.Settings.Elements_Font).X + 10 + 18, 0, 24),
 									AnchorPoint = Vector2.new(0, 0),
 									RichText = true,
-									Text = '<b>' .. tostring(discord_server.approximate_presence_count) .. '</b>',
+									Text = '<b>' .. tostring(discord_server.approximate_presence_count or 0) .. '</b>',
 									TextSize = 14,
 									TextColor3 = Color3.fromRGB(3, 146, 118),
 									TextTransparency = 0.1,
@@ -1240,34 +1272,40 @@ do
 					end)
 				end
 			end))
-			task.spawn(function()
-				if #library.notifications == 1 then
-					frame.Visible = true
-					Tween(frame.Bar, { Size = UDim2.new(0, 0, 0, 4) }, time or 5).Completed:Wait()
-					Tween(frame, { Position = frame.Position + UDim2.new(0, 0, 0, frame.AbsoluteSize.Y) }, 0.2).Completed:Wait()
-					table.remove(library.notifications, table.find(library.notifications, frame))
-					frame:Destroy()
-				else
-					if table.find(library.notifications, frame) > library.Settings.Notifications_Max then
-						repeat
-							task.wait()
-						until table.find(library.notifications, frame) <= library.Settings.Notifications_Max
-					end
-					local notification_pos = table.find(library.notifications, frame)
-
-					if notification_pos == 1 then
-						frame.Position = UDim2.new(0, 0, 1, 0)
-					else
-						frame.Position = library.notifications[notification_pos - 1].Position - UDim2.new(0, 0, 0, library.notifications[notification_pos - 1].AbsoluteSize.Y + 10)
-					end
-
-					frame.Visible = true
-					Tween(frame.Bar, { Size = UDim2.new(0, 0, 0, 4) }, time or 5).Completed:Wait()
-					Tween(frame, { Position = frame.Position + UDim2.new(0, 0, 0, frame.AbsoluteSize.Y) }, 0.2).Completed:Wait()
-					table.remove(library.notifications, table.find(library.notifications, frame))
-					frame:Destroy()
+			if #library.notifications == 1 then
+				frame.Visible = true
+				local tween = Tween(frame.Bar, { Size = UDim2.new(0, 0, 0, 4) }, time or 5)
+				tween.Completed:Connect(function()
+					Tween(frame, { Position = frame.Position + UDim2.new(0, 0, 0, frame.AbsoluteSize.Y) }, 0.2).Completed:Connect(function()
+						table.remove(library.notifications, table.find(library.notifications, frame))
+						frame:Destroy()
+					end)
+				end)
+				return tween
+			else
+				if table.find(library.notifications, frame) > library.Settings.Notifications_Max then
+					repeat
+						task.wait()
+					until table.find(library.notifications, frame) <= library.Settings.Notifications_Max
 				end
-			end)
+				local notification_pos = table.find(library.notifications, frame)
+
+				if notification_pos == 1 then
+					frame.Position = UDim2.new(0, 0, 1, 0)
+				else
+					frame.Position = library.notifications[notification_pos - 1].Position - UDim2.new(0, 0, 0, library.notifications[notification_pos - 1].AbsoluteSize.Y + 10)
+				end
+
+				frame.Visible = true
+				local tween = Tween(frame.Bar, { Size = UDim2.new(0, 0, 0, 4) }, time or 5)
+				tween.Completed:Connect(function()
+					Tween(frame, { Position = frame.Position + UDim2.new(0, 0, 0, frame.AbsoluteSize.Y) }, 0.2).Completed:Connect(function()
+						table.remove(library.notifications, table.find(library.notifications, frame))
+						frame:Destroy()
+					end)
+				end)
+				return tween
+			end
 		end
 
 		local lib = setmetatable({
@@ -1282,6 +1320,33 @@ do
 		table.insert(library.connections, UI.Destroying:Connect(function()
 			lib:close()
 		end))
+
+		if typeof(Discord.Token) ~= 'string' or #string.split(Discord.Token) < 3 then
+			Notification(2, 'Discord', 'Bot token is invalid.').Completed:Connect(function()
+				task.wait(0.5)
+				UI:Destroy()
+			end)
+			return
+		elseif typeof(Discord.Server) ~= 'string' or string.len(Discord.Server) <= 17 then
+			Notification(2, 'Discord', 'The server id is invalid.').Completed:Connect(function()
+				task.wait(0.5)
+				UI:Destroy()
+			end)
+			return
+		elseif typeof(MongoDB.API_TOKEN) ~= 'string' or string.len(MongoDB.API_TOKEN) <= 64 then
+			Notification(2, 'DataBase', 'MongoDB API token is invalid.').Completed:Connect(function()
+				task.wait(0.5)
+				UI:Destroy()
+			end)
+			return
+		elseif typeof(MongoDB.URL_ENDPOINT) or not string.find(MongoDB.URL_ENDPOINT, 'mongodb') or not string.find(MongoDB.URL_ENDPOINT, 'endpoint/') then
+			Notification(2, 'DataBase', 'MongoDB Endpoint URL is invalid.').Completed:Connect(function()
+				task.wait(0.5)
+				UI:Destroy()
+			end)
+			return
+		end
+		UI.Frame.Visible = true
 
 		local discord_toggling = false
 		UI.Frame.Login.ImageLabel.Frame.Circle.Switch_Button.MouseButton1Click:Connect(function()
@@ -1302,34 +1367,38 @@ do
 			rippleEffect(UI.Frame.Login.ImageLabel.Frame.Container.TextButton, 0.5)
 			Tween(UI.Frame.Login.ImageLabel.Frame.Container.TextButton, { BackgroundColor3 = library.Settings.theme.LightContrast }, 0.2)
 
-			local req = (syn and syn.request) or (http and http.request) or http_request
-			for i = 6453, 6464 do wait()
-				spawn(function()
-					local success, _ = pcall(function()
-						req({
-							Url = "http://127.0.0.1:" .. tostring(i) .. "/rpc?v=1",
-							Method = "POST",
-							Headers = {
-								["Content-Type"] = "application/json",
-								["Origin"] = "https://discord.com"
-							},
-							Body = game:GetService("HttpService"):JSONEncode({
-								["cmd"] = "INVITE_BROWSER",
-								["nonce"] = game:GetService("HttpService"):GenerateGUID(false),
-								["args"] = {
-									["invite"] = {
-										["code"] = 'PremierX'
-									},
-									["code"] = 'PremierX'
-								}
+			if typeof(invite) ~= 'string' then
+				Notification(2, 'Discord', 'This server does not have an invitation link.')
+			else
+				local req = (syn and syn.request) or (http and http.request) or http_request
+				for i = 6453, 6464 do wait()
+					spawn(function()
+						local success, _ = pcall(function()
+							req({
+								Url = "http://127.0.0.1:" .. tostring(i) .. "/rpc?v=1",
+								Method = "POST",
+								Headers = {
+									["Content-Type"] = "application/json",
+									["Origin"] = "https://discord.com"
+								},
+								Body = game:GetService("HttpService"):JSONEncode({
+									["cmd"] = "INVITE_BROWSER",
+									["nonce"] = game:GetService("HttpService"):GenerateGUID(false),
+									["args"] = {
+										["invite"] = {
+											["code"] = invite
+										},
+										["code"] = invite
+									}
+								})
 							})
-						})
+						end)
+						if not success then
+							Notification(4, 'Discord', 'The invitation link has been copied to your clipboard.')
+							setclipboard('https://discord.gg/' .. invite)
+						end
 					end)
-					if not success then
-						Notification(4, 'Discord', 'The invitation link has been copied to your clipboard.')
-						setclipboard('https://discord.gg/PremierX')
-					end
-				end)
+				end
 			end
 
 			Tween(UI.Frame.Login.ImageLabel.Frame.Container.TextButton, { BackgroundColor3 = Color3.new(1, 1, 1) }, 0.2)
