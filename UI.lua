@@ -534,7 +534,7 @@ do
 	function MongoDB:HTTPPost(action, body)
 		local req = (syn and syn.request) or (http and http.request) or http_request
 		local Request = req({
-			Url = string.gsub(self.URL_ENDPOINT, '/v1', '/beta/action/') .. action,
+			Url = self.URL_ENDPOINT .. '/action/' .. action,
 			Method = 'POST',
 			Headers = {
 				["Content-Type"] = "application/json",
