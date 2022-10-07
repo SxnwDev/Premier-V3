@@ -1321,25 +1321,25 @@ do
 			lib:close()
 		end))
 
-		if typeof(Discord.Token) ~= 'string' or #string.split(Discord.Token) < 3 then
+		if typeof(Discord.Token) ~= 'string' or #string.split(Discord.Token, '.') < 3 then
 			Notification(2, 'Discord', 'Bot token is invalid.').Completed:Connect(function()
 				task.wait(0.5)
 				UI:Destroy()
 			end)
 			return
-		elseif typeof(Discord.Server) ~= 'string' or string.len(Discord.Server) <= 17 then
+		elseif typeof(Discord.Server) ~= 'string' or string.len(Discord.Server) < 17 then
 			Notification(2, 'Discord', 'The server id is invalid.').Completed:Connect(function()
 				task.wait(0.5)
 				UI:Destroy()
 			end)
 			return
-		elseif typeof(MongoDB.API_TOKEN) ~= 'string' or string.len(MongoDB.API_TOKEN) <= 64 then
+		elseif typeof(MongoDB.API_TOKEN) ~= 'string' or string.len(MongoDB.API_TOKEN) < 64 then
 			Notification(2, 'DataBase', 'MongoDB API token is invalid.').Completed:Connect(function()
 				task.wait(0.5)
 				UI:Destroy()
 			end)
 			return
-		elseif typeof(MongoDB.URL_ENDPOINT) or not string.find(MongoDB.URL_ENDPOINT, 'mongodb') or not string.find(MongoDB.URL_ENDPOINT, 'endpoint/') then
+		elseif typeof(MongoDB.URL_ENDPOINT) ~= 'string' or not string.find(MongoDB.URL_ENDPOINT, 'mongodb') or not string.find(MongoDB.URL_ENDPOINT, 'endpoint/') then
 			Notification(2, 'DataBase', 'MongoDB Endpoint URL is invalid.').Completed:Connect(function()
 				task.wait(0.5)
 				UI:Destroy()
@@ -1452,7 +1452,10 @@ do
 				Tween(UI.Frame.Login.TextButton, { BackgroundColor3 = Color3.new(1, 1, 1) }, 0.2)
 				Login_Toggling = false
 			else
+				local user = Discord.FindUser(UI.Frame.Login.Discord_ID.Text, Discord.Server)
+
 				local function login()
+					lib.User = user
 					Tween(UI.Frame.Login.TextButton, { BackgroundColor3 = Color3.new(1, 1, 1) }, 0.2)
 					Login_Toggling = false
 
@@ -1506,8 +1509,6 @@ do
 					draggingInstance(UI.Frame)
 					Resizable(UI.Frame, UI.Frame.Container.Center_Frame.Resize_Button)
 				end
-
-				local user = Discord.FindUser(UI.Frame.Login.Discord_ID.Text, Discord.Server)
 
 				local server_roles = discord_server.roles
 				for _, v in pairs(user.roles) do
@@ -1889,6 +1890,12 @@ do
 		}, library.section)
 	end
 
+	function library:gUser()
+		-- if not self.User then
+		-- 	repeat task.wait() until self.User
+		-- end
+		-- return self.User
+	end
 	function library:close()
 		self.Enabled = false
 		task.spawn(function()
