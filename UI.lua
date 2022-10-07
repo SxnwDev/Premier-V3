@@ -1455,7 +1455,6 @@ do
 				local user = Discord.FindUser(UI.Frame.Login.Discord_ID.Text, Discord.Server)
 
 				local function login()
-					lib.User = user
 					Tween(UI.Frame.Login.TextButton, { BackgroundColor3 = Color3.new(1, 1, 1) }, 0.2)
 					Login_Toggling = false
 
@@ -1500,7 +1499,7 @@ do
 					end
 					task.wait(effect_time/2)
 					Tween(UI.Frame, { Size = UDim2.new(0, 650, 0, 380) }, effect_time/2).Completed:Wait()
-					UI.Frame.Container.Center_Frame.Section_Container.UIGridLayout.CellSize = UDim2.new(0, UI.Frame.Container.Center_Frame.Section_Container.AbsoluteSize.X, 0, UI.Frame.Container.Center_Frame.Section_Container.AbsoluteSize.Y)
+					lib.User = user
 
 					UI.Frame.Login:Destroy()
 
@@ -1510,15 +1509,6 @@ do
 					Resizable(UI.Frame, UI.Frame.Container.Center_Frame.Resize_Button)
 				end
 
-				local server_roles = discord_server.roles
-				for _, v in pairs(user.roles) do
-					for _, role in pairs(server_roles) do
-						if role.id == v then
-							print(role.name, role.position)
-							break
-						end
-					end
-				end
 				if user then
 					if CheckBox_Enabled then
 						writefile('Premier UI/discord_id.lua', UI.Frame.Login.Discord_ID.Text)
@@ -1605,7 +1595,6 @@ do
 							seconds += 1
 						end
 					end)
-
 				else
 					Tween(UI.Frame.Login.Discord_ID.Bar, { BackgroundColor3 = Color3.fromRGB(211, 86, 98) }, 0.2)
 				end
@@ -1627,8 +1616,21 @@ do
 			Logo_Toggling = false
 		end)
 		UI.Frame.Container.Center_Frame:GetPropertyChangedSignal('AbsoluteSize'):Connect(function()
-			pcall(function()
-				lib.focusedPage:Resize()
+			task.spawn(function()
+				pcall(function()
+					lib.sectionContainer.CanvasSize = UDim2.new(0, 0, 0, (#lib.pages * lib.sectionContainer.AbsoluteSize.Y) + (#lib.pages * lib.sectionContainer.UIGridLayout.CellPadding.Y.Offset))
+					lib.sectionContainer.UIGridLayout.CellSize = UDim2.new(0, lib.sectionContainer.AbsoluteSize.X, 0, lib.sectionContainer.AbsoluteSize.Y)
+				end)
+			end)
+			task.spawn(function()
+				pcall(function()
+					lib.focusedPage:Resize()
+				end)
+			end)
+			task.spawn(function()
+				pcall(function()
+					lib.sectionContainer.CanvasPosition = Vector2.new(0, ((table.find(lib.pages, lib.focusedPage) - 1) * lib.sectionContainer.AbsoluteSize.Y) + ((table.find(lib.pages, lib.focusedPage) - 1) * lib.sectionContainer.UIGridLayout.CellPadding.Y.Offset))
+				end)
 			end)
 		end)
 
@@ -1689,75 +1691,64 @@ do
 			end
 		end)
 
-		task.spawn(function()
-			repeat task.wait() until lib.finish
-			for i = 1, #AssetToLoad do
-				local Completed = false
-				game:GetService("ContentProvider"):PreloadAsync({ AssetToLoad[i] }, function()
-					Tween(UI.Frame.Loader.Bar.Fill, { Size = UDim2.new(i/#AssetToLoad, 0, 1, 0) }, 0.2)
-					Completed = true
-				end)
-				repeat task.wait() until Completed
-			end
-			repeat task.wait() until UI.Frame.Loader.Bar.Fill.Size == UDim2.new(1, 0, 1, 0)
+		for i = 1, #AssetToLoad do
+			local Completed = false
+			game:GetService("ContentProvider"):PreloadAsync({ AssetToLoad[i] }, function()
+				Tween(UI.Frame.Loader.Bar.Fill, { Size = UDim2.new(i/#AssetToLoad, 0, 1, 0) }, 0.2)
+				Completed = true
+			end)
+			repeat task.wait() until Completed
+		end
+		repeat task.wait() until UI.Frame.Loader.Bar.Fill.Size == UDim2.new(1, 0, 1, 0)
 
-			local effect_time = 0.4
-			task.wait(effect_time)
-			for _, v in pairs(UI.Frame.Loader:GetDescendants()) do
-				local a, _ = pcall(function()
-					return v.BackgroundTransparency
-				end)
-				local a2, _ = pcall(function()
-					return v.ImageTransparency
-				end)
-				local a3, _ = pcall(function()
-					return v.TextTransparency
-				end)
-				if a then
-					local tween = Tween(v, { BackgroundTransparency = 1 }, effect_time)
-					task.spawn(function()
-						tween.Completed:Wait()
-						pcall(function()
-							v:Destroy()
-						end)
+		local effect_time = 0.4
+		task.wait(effect_time)
+		for _, v in pairs(UI.Frame.Loader:GetDescendants()) do
+			local a, _ = pcall(function()
+				return v.BackgroundTransparency
+			end)
+			local a2, _ = pcall(function()
+				return v.ImageTransparency
+			end)
+			local a3, _ = pcall(function()
+				return v.TextTransparency
+			end)
+			if a then
+				local tween = Tween(v, { BackgroundTransparency = 1 }, effect_time)
+				task.spawn(function()
+					tween.Completed:Wait()
+					pcall(function()
+						v:Destroy()
 					end)
-				end
-				if a2 then
-					local tween = Tween(v, { ImageTransparency = 1 }, effect_time)
-					task.spawn(function()
-						tween.Completed:Wait()
-						pcall(function()
-							v:Destroy()
-						end)
-					end)
-				end
-				if a3 then
-					local tween = Tween(v, { TextTransparency = 1 }, effect_time)
-					task.spawn(function()
-						tween.Completed:Wait()
-						pcall(function()
-							v:Destroy()
-						end)
-					end)
-				end
+				end)
 			end
-			task.wait(effect_time/2)
-
-			Tween(UI.Frame.UICorner, { CornerRadius = UDim.new(0, 8) }, effect_time/2)
-			Tween(UI.Frame, { Size = UDim2.new(0, 400, 0, 235) }, effect_time/2).Completed:Wait()
-			UI.Frame.Loader:Destroy()
-			UI.Frame.Login.Visible = true
-
-			if #lib.pages > 0 then
-				local page = lib.pages[1]
-				Tween(page.button, { BackgroundTransparency = 0 }, 0.2)
-				Tween(page.button.Frame, { BackgroundTransparency = 0 }, 0.2)
-				Tween(page.button.Icon, { ImageColor3 = library.Settings.theme.PlaceHolderColor }, 0.2)
-				Tween(page.button.Title, { TextColor3 = library.Settings.theme.PlaceHolderColor }, 0.2)
-
-				lib.focusedPage = page
+			if a2 then
+				local tween = Tween(v, { ImageTransparency = 1 }, effect_time)
+				task.spawn(function()
+					tween.Completed:Wait()
+					pcall(function()
+						v:Destroy()
+					end)
+				end)
 			end
-		end)
+			if a3 then
+				local tween = Tween(v, { TextTransparency = 1 }, effect_time)
+				task.spawn(function()
+					tween.Completed:Wait()
+					pcall(function()
+						v:Destroy()
+					end)
+				end)
+			end
+		end
+		task.wait(effect_time/2)
+
+		Tween(UI.Frame.UICorner, { CornerRadius = UDim.new(0, 8) }, effect_time/2)
+		Tween(UI.Frame, { Size = UDim2.new(0, 400, 0, 235) }, effect_time/2).Completed:Wait()
+		UI.Frame.Loader:Destroy()
+		UI.Frame.Login.Visible = true
+
+		repeat task.wait() until lib.User
 
 		return lib
 	end
@@ -1890,12 +1881,6 @@ do
 		}, library.section)
 	end
 
-	function library:gUser()
-		-- if not self.User then
-		-- 	repeat task.wait() until self.User
-		-- end
-		-- return self.User
-	end
 	function library:close()
 		self.Enabled = false
 		task.spawn(function()
@@ -1904,6 +1889,11 @@ do
 			end
 		end)
 	end
+	function library:finish()
+		if not self.focusedPage then
+			self:SelectPage(self.pages[1], true)
+		end
+	end
 
 	function library:addPage(config)
 		config = config or {}
@@ -1911,7 +1901,8 @@ do
 		local page = self.page.new(config)
 
 		table.insert(self.pages, page)
-        self.sectionContainer.CanvasSize = UDim2.new(0, 0, 0, (#self.pages - 1) * self.sectionContainer.AbsoluteSize.Y)
+		self.sectionContainer.CanvasSize = UDim2.new(0, 0, 0, (#self.pages * self.sectionContainer.AbsoluteSize.Y) + (#self.pages * self.sectionContainer.UIGridLayout.CellPadding.Y.Offset))
+		self.sectionContainer.UIGridLayout.CellSize = UDim2.new(0, self.sectionContainer.AbsoluteSize.X, 0, self.sectionContainer.AbsoluteSize.Y)
 
 		page.button.MouseButton1Click:Connect(function()
 			self:SelectPage(page, true)
