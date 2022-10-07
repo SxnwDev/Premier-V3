@@ -16,6 +16,6 @@ local window = UI.Library.new()
 
 -- script content
 
-window.finish = true -- THIS MUST ALWAYS GO AT THE END OF THE SCRIPT
+window:finish() -- THIS MUST ALWAYS GO AT THE END OF THE SCRIPT
 ```
 #### [Bot Code](https://github.com/SxnwDev/Premier-V3/blob/main/WhiteList%20Bot.rar)
