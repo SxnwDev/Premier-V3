@@ -2072,7 +2072,7 @@ do
 	end
 	function library.section:addButton(config)
 		config = config or {}
-		local text = betterFindIndex(config, 'Text')
+		local title = betterFindIndex(config, 'title')
 		local disabled = betterFindIndex(config, 'Disabled') or false
 		local button = newInstance('ImageButton', {
 			Name = 'Button_Module',
@@ -2085,7 +2085,7 @@ do
             newInstance('TextLabel', {
                 Size = UDim2.new(1, 0, 1, 0),
                 BackgroundTransparency = 1,
-                Text = (text and text ~= '' and text) or 'Button',
+                Text = (title and title ~= '' and title) or 'Button',
                 Font = library.Settings.Elements_Font,
 				TextSize = 14,
                 RichText = true,
@@ -2103,7 +2103,7 @@ do
 			}),
 			newInstance('StringValue', {
 				Name = 'SearchValue',
-				Value = ((text and text ~= '' and text) or 'Button'):gsub('<[^<>]->', ''),
+				Value = ((title and title ~= '' and title) or 'Button'):gsub('<[^<>]->', ''),
 			}),
 		}, UDim.new(0, betterFindIndex(config, 'Corner') or 5))
 
@@ -2128,7 +2128,7 @@ do
 			new_config = new_config or {}
 			for i,v in pairs(new_config) do
 				config[i] = v
-				if string.lower(tostring(i)) == 'text' then
+				if string.lower(tostring(i)) == 'title' then
 					button.TextLabel.Text = v
 				elseif  string.lower(tostring(i)) == 'disabled' then
 					if v then
