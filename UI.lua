@@ -7,7 +7,7 @@ local mouse = player:GetMouse()
 -- Library variables
 local library = {
 	Version = '1',
-	Parent = player.PlayerGui,
+	Parent = game.CoreGui,
 	Settings = {
 		NewUser = true,
 		Prefix = Enum.KeyCode.LeftAlt,
