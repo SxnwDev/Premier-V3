@@ -1033,6 +1033,7 @@ do
 								Size = UDim2.new(0, 110, 1, 0),
 								Text = '<b>' .. game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name .. '</b>',
 								RichText = true,
+								ClipsDescendants = true,
 								TextColor3 = library.Settings.theme.TextColor,
 								TextXAlignment = Enum.TextXAlignment.Left,
 								TextTruncate = Enum.TextTruncate.AtEnd,
