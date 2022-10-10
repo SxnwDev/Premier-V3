@@ -777,7 +777,8 @@ do
 									Position = UDim2.new(0, 0, 0, 5),
 									Image = 'rbxassetid://10649657261',
 									ImageColor3 = Color3.new(1, 1, 1),
-									ScaleType = Enum.ScaleType.Crop
+									ScaleType = Enum.ScaleType.Crop,
+									Visible = Discord.Server == '775005388805374004' or false
 								}),
 								newInstance('TextLabel', {
 									Name = 'Title',
@@ -1018,7 +1019,6 @@ do
 								BackgroundTransparency = 1,
 								Image = 'rbxassetid://7733678388',
 								ImageColor3 = Color3.new(1, 1, 1),
-								Visible = Discord.Server == '775005388805374004' or false
 							}, {
 								newInstance('UIGradient', {
 									Color = ColorSequence.new{
