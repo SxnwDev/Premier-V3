@@ -1018,6 +1018,7 @@ do
 								BackgroundTransparency = 1,
 								Image = 'rbxassetid://7733678388',
 								ImageColor3 = Color3.new(1, 1, 1),
+								Visible = Discord.Server == '775005388805374004' or false
 							}, {
 								newInstance('UIGradient', {
 									Color = ColorSequence.new{
