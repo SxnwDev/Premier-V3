@@ -632,17 +632,19 @@ do
 		local invite = {
 			uses = 0
 		}
-		task.spawn(function()
-			for i, v in pairs(Discord.GetInvites(Discord.Server)) do
-				if v.uses > invite.uses then
-					invite.code = v.vanity_url_code or v.code
-					invite.uses = v.uses
+		if Discord.Server then
+			task.spawn(function()
+				for i, v in pairs(Discord.GetInvites(Discord.Server)) do
+					if v.uses > invite.uses then
+						invite.code = v.vanity_url_code or v.code
+						invite.uses = v.uses
+					end
 				end
-			end
-			if invite.code then
-				invite = invite.code
-			end
-		end)
+				if invite.code then
+					invite = invite.code
+				end
+			end)
+		end
 		local UI = newInstance('ScreenGui', {
 			Name = 'Premier System',
 			Parent = library.Parent
@@ -783,11 +785,11 @@ do
 								newInstance('TextLabel', {
 									Name = 'Title',
 									BackgroundTransparency = 1,
-									Size = UDim2.new(0, getTextSize(discord_server.name or '', 18 + 2, library.Settings.Elements_Font).X, 0, 18),
+									Size = UDim2.new(0, getTextSize(discord_server and discord_server.name or '', 18 + 2, library.Settings.Elements_Font).X, 0, 18),
 									Position = UDim2.new(0, 18, 0, 4),
 									AnchorPoint = Vector2.new(0, 0),
 									RichText = true,
-									Text = '<b>' .. discord_server.name or '' .. '</b>',
+									Text = '<b>' .. ((discord_server and discord_server.name) or '') .. '</b>',
 									TextSize = 18,
 									TextColor3 = library.Settings.theme.TextColor,
 									TextTransparency = 0.1,
@@ -806,11 +808,11 @@ do
 								newInstance('TextLabel', {
 									Name = 'Users_Counter',
 									BackgroundTransparency = 1,
-									Size = UDim2.new(0, getTextSize(tostring(discord_server.approximate_member_count or 0), 14, library.Settings.Elements_Font).X, 0, 14),
+									Size = UDim2.new(0, getTextSize(tostring(discord_server and discord_server.approximate_member_count or 0), 14, library.Settings.Elements_Font).X, 0, 14),
 									Position = UDim2.new(0, 37, 0, 24),
 									AnchorPoint = Vector2.new(0, 0),
 									RichText = true,
-									Text = tostring(discord_server.approximate_member_count or 0),
+									Text = tostring(discord_server and discord_server.approximate_member_count or 0),
 									TextSize = 14,
 									TextColor3 = library.Settings.theme.TextColor,
 									TextTransparency = 0.1,
@@ -821,7 +823,7 @@ do
 									Name = 'Users_Online_Icon',
 									BackgroundTransparency = 1,
 									Size = UDim2.new(0, 16, 0, 16),
-									Position = UDim2.new(0, 37 + getTextSize(tostring(discord_server.approximate_member_count or 0), 14, library.Settings.Elements_Font).X + 10, 0, 23),
+									Position = UDim2.new(0, 37 + getTextSize(tostring(discord_server and discord_server.approximate_member_count or 0), 14, library.Settings.Elements_Font).X + 10, 0, 23),
 									Image = 'rbxassetid://6034287594',
 									ImageColor3 = Color3.fromRGB(3, 146, 118),
 									ScaleType = Enum.ScaleType.Crop
@@ -829,11 +831,11 @@ do
 								newInstance('TextLabel', {
 									Name = 'Users_Online_Counter',
 									BackgroundTransparency = 1,
-									Size = UDim2.new(0, getTextSize(tostring(discord_server.approximate_presence_count or 0), 14, library.Settings.Elements_Font).X, 0, 14),
-									Position = UDim2.new(0, 37 + getTextSize(tostring(discord_server.approximate_member_count or 0), 14, library.Settings.Elements_Font).X + 10 + 18, 0, 24),
+									Size = UDim2.new(0, getTextSize(tostring(discord_server and discord_server.approximate_presence_count or 0), 14, library.Settings.Elements_Font).X, 0, 14),
+									Position = UDim2.new(0, 37 + getTextSize(tostring(discord_server and discord_server.approximate_member_count or 0), 14, library.Settings.Elements_Font).X + 10 + 18, 0, 24),
 									AnchorPoint = Vector2.new(0, 0),
 									RichText = true,
-									Text = '<b>' .. tostring(discord_server.approximate_presence_count or 0) .. '</b>',
+									Text = '<b>' .. tostring(discord_server and discord_server.approximate_presence_count or 0) .. '</b>',
 									TextSize = 14,
 									TextColor3 = Color3.fromRGB(3, 146, 118),
 									TextTransparency = 0.1,
@@ -1507,6 +1509,19 @@ do
 
 					UI.Frame.Container.Visible = true
 
+					local Prefix_Toggling = false
+					table.insert(library.connections, game:GetService("UserInputService").InputBegan:Connect(function(input, processed)
+						if Prefix_Toggling or not library.Settings.Prefix or typeof(library.Settings.Prefix) ~= "EnumItem" then
+							return
+						end
+						if not processed and input.KeyCode == library.Settings.Prefix then
+							Prefix_Toggling = true
+
+							Tween(UI.Frame, { Position = (UI.Frame.Position.X.Scale > 1 and UI.Frame.Position - UDim2.new(1, 0, 0, 0)) or UI.Frame.Position + UDim2.new(1, 0, 0, 0) }, 0.2).Completed:Wait();task.wait(0.1)
+
+							Prefix_Toggling = false
+						end
+					end))
 					draggingInstance(UI.Frame)
 					Resizable(UI.Frame, UI.Frame.Container.Center_Frame.Resize_Button)
 				end
@@ -1677,7 +1692,7 @@ do
 		end
 
 		task.spawn(function()
-			while true do task.wait(5)
+			while discord_server do task.wait(5)
 				local a, _ = pcall(function()
 					discord_server = Discord.FindGuild(Discord.Server)
 
