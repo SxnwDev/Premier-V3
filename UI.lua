@@ -2083,6 +2083,7 @@ do
 			AutoButtonColor = false,
 			ClipsDescendants = true,
 			Size = UDim2.new(1, 0, 0, 25),
+			LayoutOrder = 1,
 		}, {
             newInstance('TextLabel', {
                 Size = UDim2.new(1, 0, 1, 0),
@@ -2175,6 +2176,7 @@ do
 			AutoButtonColor = false,
 			BackgroundColor3 = library.Settings.theme.DarkContrast,
 			Size = UDim2.new(1, 0, 0, 25),
+			LayoutOrder = 1,
 		}, {
 			newInstance('UIPadding', {
 				PaddingLeft = UDim.new(0, 10),
