@@ -1011,7 +1011,7 @@ do
 								VerticalAlignment = Enum.VerticalAlignment.Center,
 								HorizontalAlignment = Enum.HorizontalAlignment.Left,
 								FillDirection = Enum.FillDirection.Horizontal,
-								Padding = UDim.new(0, 10),
+								Padding = UDim.new(0, 2),
 								SortOrder = Enum.SortOrder.LayoutOrder
 							}),
 							newInstance('ImageButton', {
@@ -1029,9 +1029,14 @@ do
 									}
 								})
 							}),
+							newInstance('Frame', {
+								LayoutOrder = 1,
+								BackgroundTransparency = 1,
+								Size = UDim2.new(0, 6, 0, 0),
+							}),
 							newInstance('TextLabel', {
 								Name = 'Title',
-								LayoutOrder = 1,
+								LayoutOrder = 2,
 								BackgroundTransparency = 1,
 								Size = UDim2.new(0, 110, 1, 0),
 								Text = '<b>' .. game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name .. '</b>',
@@ -1043,6 +1048,19 @@ do
 								TextSize = 18,
 								Font = library.Settings.Elements_Font
 							}),
+							newInstance('TextLabel', {
+								LayoutOrder = 3,
+								BackgroundTransparency = 1,
+								Size = UDim2.new(0, getTextSize('...', 18, library.Settings.Elements_Font).X, 1, 0),
+								Visible = getTextSize(game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name, 18, library.Settings.Elements_Font).X > 110 or false,
+								Text = '<b>...</b>',
+								RichText = true,
+								TextColor3 = library.Settings.theme.TextColor,
+								TextXAlignment = Enum.TextXAlignment.Left,
+								TextTruncate = Enum.TextTruncate.AtEnd,
+								TextSize = 18,
+								Font = library.Settings.Elements_Font
+							})
 						}),
 						newInstance('Frame', {
 							Name = 'Search_Frame',
