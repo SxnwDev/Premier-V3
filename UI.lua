@@ -20,6 +20,7 @@ local library = {
 			Background = Color3.fromRGB(10,10,15),
 			DarkContrast = Color3.fromRGB(14,17,24),
 			LightContrast = Color3.fromRGB(105, 105, 105),
+			Contrast = Color3.fromRGB(5, 5, 7),
 			TextColor = Color3.fromRGB(254, 254, 254),
 			PlaceHolderColor = Color3.fromRGB(190, 190, 190),
 
@@ -1215,10 +1216,11 @@ do
 		})
 
 		local function ToolTip(module, text)
+			text = text or 'ToolTip Text'
 			local tooltip = newInstance('Frame', {
 				Parent = UI.ToolTips_Container,
 				Size = UDim2.new(0, 350, 0, 24),
-				BackgroundColor3 = Color3.fromRGB(5, 5, 7),
+				BackgroundColor3 = library.Settings.theme.Contrast,
 				AnchorPoint = Vector2.new(0.5, 0),
 				Visible = false,
 				ZIndex = 10
@@ -1242,7 +1244,7 @@ do
 					Position = UDim2.new(0.5, 0, 0, -8),
 					AnchorPoint = Vector2.new(0.5, 0),
 					Image = 'rbxassetid://5352896021',
-					ImageColor3 = Color3.fromRGB(5, 5, 7),
+					ImageColor3 = library.Settings.theme.Contrast,
 					Rotation = 45,
 					ZIndex = 10
 				})
