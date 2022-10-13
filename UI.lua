@@ -4,6 +4,8 @@ end
 -- game variables
 local player = game:GetService('Players').LocalPlayer
 local mouse = player:GetMouse()
+local uis = game:GetService('UserInputService')
+local wrk = game:GetService('Workspace')
 -- Library variables
 local library = {
 	Version = '1',
@@ -13,6 +15,7 @@ local library = {
 		Prefix = Enum.KeyCode.LeftAlt,
 		Elements_Font = Enum.Font.SourceSans,
 		Notifications_Max = 4,
+		ToolTip_Delay = 1,
 		theme = {
 			Background = Color3.fromRGB(10,10,15),
 			DarkContrast = Color3.fromRGB(14,17,24),
@@ -369,14 +372,14 @@ do
 	function initializeKeybind()
 		library.functions.keybinds = {}
 		library.functions.ended = {}
-		game:GetService('UserInputService').InputBegan:Connect(function(key, proc)
+		uis.InputBegan:Connect(function(key, proc)
 			if library.functions.keybinds[key.KeyCode] and not proc then
 				for i, bind in pairs(library.functions.keybinds[key.KeyCode]) do
 					bind()
 				end
 			end
 		end)
-		game:GetService('UserInputService').InputEnded:Connect(function(key)
+		uis.InputEnded:Connect(function(key)
 			if key.UserInputType == Enum.UserInputType.MouseButton1 then
 				for i, callback in pairs(library.functions.ended) do
 					callback()
@@ -398,9 +401,9 @@ do
 		}
 	end
 	function keyPressed()
-		local key = game:GetService('UserInputService').InputBegan:Wait()
+		local key = uis.InputBegan:Wait()
 		while key.UserInputType ~= Enum.UserInputType.Keyboard do
-			key = game:GetService('UserInputService').InputBegan:Wait()
+			key = uis.InputBegan:Wait()
 		end
 		task.wait()
 		return key
@@ -618,8 +621,8 @@ do
 			end)
 		end
 
-		if not game:GetService('UserInputService').MouseIconEnabled then
-			game:GetService('UserInputService').MouseIconEnabled = true
+		if not uis.MouseIconEnabled then
+			uis.MouseIconEnabled = true
 		end
 
 		table.insert(library.connections, player.Idled:Connect(function()
@@ -1202,8 +1205,111 @@ do
 					PaddingRight = UDim.new(0, 10),
 					PaddingLeft = UDim.new(0, 10),
 				}),
+			}),
+			newInstance('Frame', {
+				Name = 'ToolTips_Container',
+				ClipsDescendants = true,
+				Size = UDim2.new(1, 0, 1, 0),
+				BackgroundTransparency = 1,
 			})
 		})
+
+		local function ToolTip(module, text)
+			local tooltip = newInstance('Frame', {
+				Parent = UI.ToolTips_Container,
+				Size = UDim2.new(0, 350, 0, 24),
+				BackgroundColor3 = Color3.fromRGB(5, 5, 7),
+				AnchorPoint = Vector2.new(0.5, 0),
+				Visible = false,
+				ZIndex = 10
+			}, {
+				newInstance('TextLabel', {
+					Size = UDim2.new(1, 0, 1, 0),
+					Position = UDim2.new(0.5, 0, 0.5, 0),
+					AnchorPoint = Vector2.new(0.5, 0.5),
+					BackgroundTransparency = 1,
+					Text = text,
+					Font = library.Settings.Elements_Font,
+					RichText = true,
+					TextSize = 14,
+					TextColor3 = library.Settings.theme.TextColor,
+					TextXAlignment = Enum.TextXAlignment.Center,
+					ZIndex = 11
+				}),
+				newInstance('ImageLabel', {
+					Size = UDim2.new(0, 15, 0, 15),
+					BackgroundTransparency = 1,
+					Position = UDim2.new(0.5, 0, 0, -8),
+					AnchorPoint = Vector2.new(0.5, 0),
+					Image = 'rbxassetid://5352896021',
+					ImageColor3 = Color3.fromRGB(5, 5, 7),
+					Rotation = 45,
+					ZIndex = 10
+				})
+			}, UDim.new(0, 8))
+
+			for i = 1, text:len() do
+				tooltip.TextLabel.Text = text:sub(1, i)
+				tooltip.TextLabel.Size = UDim2.new(0, tooltip.TextLabel.TextBounds.X, 0, tooltip.TextLabel.TextBounds.Y)
+			end
+			tooltip.Size = UDim2.new(0, math.min(350, math.max(40, tooltip.TextLabel.AbsoluteSize.X + 20)), 0, 10 + tooltip.TextLabel.AbsoluteSize.Y)
+
+			local sec = 0
+			local tooltip_mouse_leave
+			local tooltip_InputBegan = module.InputBegan:Connect(function(input, processed)
+				if not processed and input.UserInputType == Enum.UserInputType.MouseMovement then
+					tooltip_mouse_leave = false
+					while not tooltip.Visible do
+						if tooltip_mouse_leave then
+							break
+						end
+						if sec < library.Settings.ToolTip_Delay then
+							sec += task.wait()
+						else
+							tooltip.Visible = true
+							break
+						end
+					end
+					sec = 0
+				end
+			end)
+			table.insert(library.connections, tooltip_InputBegan)
+
+			local tooltip_MouseMoved = module.MouseMoved:Connect(function()
+				local mouse_location = uis:GetMouseLocation()
+				local camera_vp_size = wrk.CurrentCamera.ViewportSize
+
+				tooltip.Position = UDim2.new(mouse_location.X / camera_vp_size.X, 0, mouse_location.Y / camera_vp_size.Y, 0) + UDim2.new(0, 0, 0, 15)
+			end)
+			table.insert(library.connections, tooltip_MouseMoved)
+			local tooltip_MouseLeave = module.MouseLeave:Connect(function()
+				tooltip_mouse_leave = true
+				tooltip.Visible = false
+			end)
+			table.insert(library.connections, tooltip_MouseLeave)
+
+			local function Disconnect()
+				pcall(function()
+					if tooltip_InputBegan then
+						tooltip_InputBegan:Disconnect()
+						tooltip_InputBegan = nil
+					end
+					if tooltip_MouseMoved then
+						tooltip_MouseMoved:Disconnect()
+						tooltip_MouseMoved = nil
+					end
+					if tooltip_MouseLeave then
+						tooltip_MouseLeave:Disconnect()
+						tooltip_MouseLeave = nil
+					end
+					if tooltip then
+						tooltip:Destroy()
+					end
+				end)
+			end
+
+			return { Disconnect = Disconnect }
+		end
 
 		local Notification_Types = {
 			"Success",
@@ -1336,7 +1442,8 @@ do
 			pageContainer = UI.Frame.Container.Left_Frame,
 			sectionContainer = UI.Frame.Container.Center_Frame.Section_Container,
 			pages = {},
-			Notification = Notification
+			Notification = Notification,
+			ToolTip = ToolTip
 		}, library)
 
 		table.insert(library.connections, UI.Destroying:Connect(function()
@@ -2197,7 +2304,7 @@ do
 			debounce = false
 		end)
 
-		return { Disabled = Disabled, Enabled = Enabled, Update = Update }
+		return { Disabled = Disabled, Enabled = Enabled, Update = Update, Instance = button }
 	end
 	function library.section:addToggle(config)
 		config = config or {}
@@ -2351,8 +2458,518 @@ do
 			debounce = false
 		end)
 
-		return { Disabled = Disabled, Enabled = Enabled, Update = Update }
+		return { Disabled = Disabled, Enabled = Enabled, Update = Update, Instance = toggle }
 	end
+	function library.section:addDropdown(config)
+		config = config or {}
+		local title = betterFindIndex(config, "Title") or 'DropDown'
+		local disabled = betterFindIndex(config, 'Disabled') or false
+	end
+	--[[function library.section:addDropdown(config)
+		config = config or {}
+		local dropdown = Create("Frame", {
+			Name = "Dropdown_Element",
+			Parent = (library.Functions.BetterFindIndex(config, "section") or 1) > #self.container and self.container[#self.container] or self.container[library.Functions.BetterFindIndex(config, "section") or 1],
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 0, library.Settings.Elements_Size),
+			ClipsDescendants = true,
+		}, {
+			Create("UIListLayout", {
+				SortOrder = Enum.SortOrder.LayoutOrder,
+				Padding = UDim.new(0, 5),
+			}),
+			Create("Frame", {
+				BackgroundColor3 = library.Settings.theme.Background,
+				Size = UDim2.new(1, 0, 0, library.Settings.Elements_Size),
+			}, {
+				Create("UIPadding", {
+					PaddingLeft = UDim.new(0, 10),
+					PaddingRight = UDim.new(0, 10),
+				}),
+				Create("UIListLayout", {
+					Padding = UDim.new(0, 0),
+					SortOrder = Enum.SortOrder.LayoutOrder,
+					FillDirection = Enum.FillDirection.Horizontal,
+					VerticalAlignment = Enum.VerticalAlignment.Center,
+					HorizontalAlignment = Enum.HorizontalAlignment.Center,
+				}),
+				Create("TextBox", {
+					LayoutOrder = 1,
+					BackgroundTransparency = 1,
+					Size = UDim2.new(1, 0, 1, 0),
+					Font = library.Settings.Elements_Font,
+					RichText = true,
+					PlaceholderText = library.Functions.BetterFindIndex(config, "Title") and library.Functions.BetterFindIndex(config, "Title") ~= "" and library.Functions.BetterFindIndex(config, "Title") or "DropDown",
+					PlaceholderColor3 = library.Settings.theme.LightContrast,
+					Text = "",
+					TextColor3 = library.Settings.theme.TextColor,
+					TextSize = library.Settings.Elements_TextSize,
+					TextXAlignment = Enum.TextXAlignment.Left,
+					TextTruncate = Enum.TextTruncate.AtEnd,
+				}),
+				Create("Frame", {
+					LayoutOrder = 2,
+					BackgroundTransparency = 1,
+					Size = UDim2.new(0, 0, 0.8, 0)
+				}, {
+					Create("ImageButton", {
+						BackgroundTransparency = 1,
+						Size = UDim2.new(1, 0, 1, 0),
+						Image = "rbxassetid://2777862738",
+						ImageColor3 = library.Settings.theme.TextColor,
+					}),
+				}),
+				Create("ImageButton", {
+					LayoutOrder = 3,
+					Name = "KeyBind",
+					AutoButtonColor = false,
+					BackgroundColor3 = library.Settings.theme.Contrast,
+					Visible = library.Functions.BetterFindIndex(config, 'KeyBind') or false,
+					Size = UDim2.new(0, 0, 0.55, 0),
+				}, {
+					Create("TextLabel", {
+						Name = "Text",
+						BackgroundTransparency = 1,
+						ClipsDescendants = true,
+						Size = UDim2.new(1, 0, 1, 0),
+						Font = library.Settings.Elements_Font,
+						Text = library.Functions.BetterFindIndex(config, "KeyBind_Default") and library.Functions.BetterFindIndex(config, "KeyBind_Default").Name or "None",
+						TextColor3 = library.Settings.theme.LightContrast,
+						TextSize = library.Settings.Elements_TextSize,
+						TextTruncate = Enum.TextTruncate.AtEnd,
+					}),
+					Create("UIPadding", {
+						PaddingLeft = UDim.new(0, 5),
+						PaddingRight = UDim.new(0, 5),
+					}),
+				}, UDim.new(0, library.Functions.BetterFindIndex(config, "Corner") or 5)),
+			}, UDim.new(0, library.Functions.BetterFindIndex(config, "Corner") or 5)),
+			Create("Frame", {
+				Name = "List",
+				Size = UDim2.new(1, 0, 1, - library.Settings.Elements_Size - 5),
+				BorderSizePixel = 0,
+				BackgroundColor3 = library.Settings.theme.Background,
+			}, {
+				Create("UIPadding", {
+					PaddingBottom = UDim.new(0, 5),
+					PaddingLeft = UDim.new(0, 5),
+					PaddingRight = UDim.new(0, 5),
+					PaddingTop = UDim.new(0, 5),
+				}),
+				Create("ScrollingFrame", {
+					Active = true,
+					BackgroundTransparency = 1,
+					BorderSizePixel = 0,
+					Size = UDim2.new(1, 0, 1, 0),
+					CanvasSize = UDim2.new(0, 0, 0, 0),
+					ScrollBarThickness = 3,
+					ScrollBarImageColor3 = library.Settings.theme.TextColor,
+					ScrollBarImageTransparency = 1,
+				}, {
+					Create("UIListLayout", {
+						SortOrder = Enum.SortOrder.LayoutOrder,
+						Padding = UDim.new(0, 5),
+					}),
+					Create("UIPadding", {
+						PaddingLeft = UDim.new(0, 5),
+						PaddingRight = UDim.new(0, 5),
+					}),
+				}),
+			}, UDim.new(0, library.Functions.BetterFindIndex(config, "Corner") or 5)),
+			Create("StringValue", {
+				Name = "SearchValue",
+				Value = library.Functions.BetterFindIndex(config, "Title") and library.Functions.BetterFindIndex(config, "Title") ~= "" and library.Functions.BetterFindIndex(config, "Title") or "DropDown",
+			}),
+		})
+		dropdown.Frame.KeyBind.Size = UDim2.new(0, dropdown.Frame.KeyBind.AbsoluteSize.Y * 5, 0.55, 0)
+		dropdown.Frame.Frame.Size = UDim2.new(0, dropdown.Frame.Frame.AbsoluteSize.Y, 0, dropdown.Frame.Frame.AbsoluteSize.Y)
+		dropdown.Frame.TextBox.Size = UDim2.new(1, - dropdown.Frame.Frame.AbsoluteSize.X, 1, 0)
+-- FIX CALLBACK
+		table.insert(self.modules, dropdown)
+		self.page:Resize()
+
+		local list = library.Functions.BetterFindIndex(config, "List") or {}
+		local toggling_table = {}
+		local multiList = {}
+		local multiListGroup = {}
+		local savedValues = {}
+		local _value
+
+		local function update(update_config)
+			update_config = update_config or {}
+
+			if library.Functions.BetterFindIndex(update_config, "Title") and library.Functions.BetterFindIndex(update_config, "Title") ~= "" then
+				dropdown.Frame.TextBox.PlaceholderText = library.Functions.BetterFindIndex(update_config, "Title")
+				dropdown.SearchValue.Value = library.Functions.BetterFindIndex(update_config, "Title")
+			end
+
+			local function check_boolean(var)
+				if library.Functions.BetterFindIndex(update_config, var) ~= nil then
+					if typeof(library.Functions.BetterFindIndex(update_config, var)) == "boolean" then
+						return library.Functions.BetterFindIndex(update_config, var)
+					else
+						return false
+					end
+				elseif library.Functions.BetterFindIndex(config, var) ~= nil then
+					if typeof(library.Functions.BetterFindIndex(config, var)) == "boolean" then
+						return library.Functions.BetterFindIndex(config, var)
+					else
+						return false
+					end
+				else
+					return false
+				end
+			end
+			local function check_value(var)
+				if library.Functions.BetterFindIndex(update_config, var) ~= nil then
+					return library.Functions.BetterFindIndex(update_config, var)
+				elseif library.Functions.BetterFindIndex(config, var) ~= nil then
+					return library.Functions.BetterFindIndex(config, var)
+				end
+			end
+
+			dropdown.Frame.KeyBind.Visible = check_boolean("KeyBind")
+			if check_boolean("KeyBind") then
+				dropdown.Frame.TextBox.Size = UDim2.new(1, - dropdown.Frame.Frame.AbsoluteSize.X - dropdown.Frame.KeyBind.AbsoluteSize.X, 1, 0)
+			else
+				dropdown.Frame.TextBox.Size = UDim2.new(1, - dropdown.Frame.Frame.AbsoluteSize.X, 1, 0)
+			end
+
+			local function updateDropdown_Item(dropdown_Item, value, multi)
+				if toggling_table[dropdown_Item] then
+					return
+				end
+
+				toggling_table[dropdown_Item] = true
+
+				if value then
+					library.Functions.Tween(dropdown_Item.ImageButton, { BackgroundColor3 = library.Settings.theme.Accent }, 0.3)
+					task.spawn(function()
+						task.wait(0.15)
+						pcall(function()
+							library.Functions.Tween(dropdown_Item.ImageButton.ImageLabel, { ImageTransparency = 0 }, 0.2)
+						end)
+					end)
+				else
+					library.Functions.Tween(dropdown_Item.ImageButton, { BackgroundColor3 = library.Settings.theme.DarkContrast }, 0.3)
+					library.Functions.Tween(dropdown_Item.ImageButton.ImageLabel, { ImageTransparency = 1 }, 0.3)
+				end
+
+				if multi then
+					local temp_list =  {}
+					for _, v in pairs(multiListGroup) do
+						if v.IsEnabled.Value then
+							table.insert(temp_list, v.ListName.Value)
+						end
+					end
+					dropdown.Frame.TextBox.PlaceholderText = #temp_list > 0 and dropdown.SearchValue.Value .. ' - ' .. table.concat(temp_list, ', ') or dropdown.SearchValue.Value
+				else
+					dropdown.Frame.TextBox.PlaceholderText = value and dropdown.SearchValue.Value .. ' - ' .. dropdown_Item.ListName.Value  or dropdown.SearchValue.Value
+					for _, v in pairs(multiListGroup) do
+						if v ~= dropdown_Item then
+							v.IsEnabled.Value = false
+							library.Functions.Tween(v.ImageButton,{ BackgroundColor3 = library.Settings.theme.DarkContrast }, 0.3)
+							library.Functions.Tween(v.ImageButton.ImageLabel, { ImageTransparency = 1 }, 0.3)
+						end
+					end
+				end
+
+				task.spawn(function()
+					task.wait(0.3)
+					toggling_table[dropdown_Item] = false
+				end)
+			end
+
+			if library.Functions.BetterFindIndex(update_config, "List") then
+				table.clear(multiListGroup)
+				table.clear(toggling_table)
+				task.spawn(function()
+					for i, button in pairs(dropdown.List.ScrollingFrame:GetChildren()) do
+						if button:IsA("ImageButton") then
+							button:Destroy()
+						end
+					end
+					for i, value in pairs(library.Functions.BetterFindIndex(update_config, "List") or {}) do
+						local original_value = value
+						value = tostring(value)
+						local Dropdown_Item = Create("ImageButton", {
+							BackgroundTransparency = 1,
+							Parent = dropdown.List.ScrollingFrame,
+							Size = UDim2.new(1, 0, 0, library.Settings.Elements_Size),
+							AutoButtonColor = false,
+						}, {
+							Create("BoolValue", {
+								Name = "IsEnabled",
+								Value = savedValues[value] or false,
+							}),
+							Create("StringValue", {
+								Name = "ListName",
+								Value = value,
+							}),
+							Create("UIListLayout", {
+								Padding = UDim.new(0, 10),
+								VerticalAlignment = Enum.VerticalAlignment.Center,
+								FillDirection = Enum.FillDirection.Horizontal,
+							}),
+							Create("ImageButton", {
+								BackgroundColor3 = library.Settings.theme.DarkContrast,
+								Size = UDim2.new(0, 0, 0.75, 0),
+								AutoButtonColor = false,
+							}, {
+								Create("ImageLabel", {
+									BackgroundTransparency = 1,
+									Size = UDim2.new(0.8, 0, 0.8, 0),
+									Position = UDim2.new(0.5, 0, 0.5, 0),
+									AnchorPoint = Vector2.new(0.5, 0.5),
+									Image = "rbxassetid://7072706620",
+									ImageColor3 = library.Settings.theme.TextColor,
+									ImageTransparency = 1,
+								}),
+							}, UDim.new(0, check_value("Corner") or 5)),
+							Create("TextLabel", {
+								BackgroundTransparency = 1,
+								Size = UDim2.new(1, 0, 1, 0),
+								Font = library.Settings.Elements_Font,
+								RichText = true,
+								Text = value,
+								TextColor3 = library.Settings.theme.TextColor,
+								TextSize = library.Settings.Elements_TextSize,
+								TextXAlignment = Enum.TextXAlignment.Left,
+							}),
+						})
+						toggling_table[Dropdown_Item] = false
+						Dropdown_Item.ImageButton.Size = UDim2.new(0, Dropdown_Item.ImageButton.AbsoluteSize.Y, 0, Dropdown_Item.ImageButton.AbsoluteSize.Y)
+						Dropdown_Item.TextLabel.Size = UDim2.new(1, - Dropdown_Item.ImageButton.AbsoluteSize.Y - Dropdown_Item.UIListLayout.Padding.Offset, 1, 0)
+						updateDropdown_Item(
+							Dropdown_Item,
+							Dropdown_Item.IsEnabled.Value,
+							check_value("Multi")
+						)
+
+						table.insert(multiListGroup, Dropdown_Item)
+
+						Dropdown_Item.MouseButton1Click:Connect(function()
+							Dropdown_Item.IsEnabled.Value = not Dropdown_Item.IsEnabled.Value
+							savedValues[value] = Dropdown_Item.IsEnabled.Value
+
+							if check_value("Multi") then
+								if Dropdown_Item.IsEnabled.Value then
+									table.insert(multiList, value)
+								else
+									if table.find(multiList, value) then
+										table.remove(
+											multiList,
+											table.find(multiList, value)
+										)
+									end
+								end
+							end
+
+							updateDropdown_Item(
+								Dropdown_Item,
+								Dropdown_Item.IsEnabled.Value,
+								check_value("Multi")
+							)
+
+							if check_value("CallBack") then
+								if check_boolean("KeyBind") then
+									if check_value("Multi") then
+										_value = multiList
+									else
+										if Dropdown_Item.IsEnabled.Value then
+											_value = original_value
+										else
+											_value = nil
+										end
+									end
+								else
+									if check_value("Multi") then
+										check_value("CallBack")(multiList)
+									else
+										if Dropdown_Item.IsEnabled.Value then
+											check_value("CallBack")(original_value)
+										else
+											check_value("CallBack")(nil)
+										end
+									end
+								end
+							end
+						end)
+						Dropdown_Item.ImageButton.MouseButton1Click:Connect(function()
+							Dropdown_Item.IsEnabled.Value = not Dropdown_Item.IsEnabled.Value
+							savedValues[value] = Dropdown_Item.IsEnabled.Value
+
+							if check_value("Multi") then
+								if Dropdown_Item.IsEnabled.Value then
+									table.insert(multiList, value)
+								else
+									if table.find(multiList, value) then
+										table.remove(
+											multiList,
+											table.find(multiList, value)
+										)
+									end
+								end
+							end
+
+							updateDropdown_Item(
+								Dropdown_Item,
+								Dropdown_Item.IsEnabled.Value,
+								check_value("Multi")
+							)
+
+							if check_value("CallBack") then
+								if check_boolean("KeyBind") then
+									if check_value("Multi") then
+										_value = multiList
+									else
+										if Dropdown_Item.IsEnabled.Value then
+											_value = original_value
+										else
+											_value = nil
+										end
+									end
+								else
+									if check_value("Multi") then
+										check_value("CallBack")(multiList)
+									else
+										if Dropdown_Item.IsEnabled.Value then
+											check_value("CallBack")(original_value)
+										else
+											check_value("CallBack")(nil)
+										end
+									end
+								end
+							end
+						end)
+					end
+				end)
+			end
+		end
+
+		update({
+			Multi = library.Functions.BetterFindIndex(config, "Multi") or false,
+			Default = library.Functions.BetterFindIndex(config, "Default"),
+			List = list,
+			CallBack = library.Functions.BetterFindIndex(config, "CallBack"),
+		})
+
+		local function toggle(value)
+			library.Functions.Tween(dropdown.Frame.Frame.ImageButton, { Rotation = value and 180 or 0 }, 0.3)
+			library.Functions.Tween(dropdown.Frame.Frame.ImageButton, {
+				ImageColor3 = value and library.Settings.theme.TextColor or library.Settings.theme.LightContrast
+			}, 0.3)
+
+			if value then
+				library.Functions.Tween(dropdown, {
+					Size = UDim2.new(1, 0, 0, (#list == 0 and library.Settings.Elements_Size) or library.Settings.Elements_Size + dropdown.UIListLayout.Padding.Offset + (math.clamp(#list, 0, 3) * library.Settings.Elements_Size) + (math.clamp(#list, 0, 3) * dropdown.UIListLayout.Padding.Offset)),
+				}, 0.3)
+				if #list > 3 then
+					dropdown.List.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, (#list * library.Settings.Elements_Size) + ((#list - 1) * dropdown.List.ScrollingFrame.UIListLayout.Padding.Offset))
+					dropdown.List.ScrollingFrame.ScrollBarImageTransparency = 0
+				else
+					dropdown.List.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+					dropdown.List.ScrollingFrame.ScrollBarImageTransparency = 1
+				end
+			else
+				library.Functions.Tween(dropdown, { Size = UDim2.new(1, 0, 0, library.Settings.Elements_Size) }, 0.3)
+				dropdown.List.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+				dropdown.List.ScrollingFrame.ScrollBarImageTransparency = 1
+			end
+		end
+
+		local function update_KeyBind(update_config)
+			update_config = update_config or {}
+
+			if self.binds[dropdown].connection then
+				self.binds[dropdown].connection = self.binds[dropdown].connection:UnBind()
+				if table.find(library.binds, self.binds[dropdown].connection) then
+					table.remove(library.binds, table.find(library.binds, self.binds[dropdown].connection))
+				end
+			end
+
+			if library.Functions.BetterFindIndex(update_config, "value") then
+				self.binds[dropdown].connection = library.Functions.BindToKey(library.Functions.BetterFindIndex(update_config, "value"), self.binds[dropdown].callback)
+				table.insert(library.binds, self.binds[dropdown].connection)
+				dropdown.Frame.KeyBind.Text.Text = library.Functions.BetterFindIndex(update_config, "value").Name
+			else
+				dropdown.Frame.KeyBind.Text.Text = "None"
+			end
+		end
+
+		self.binds[dropdown] = {
+			callback = function()
+				task.spawn(function()
+					library.Functions.Tween(dropdown.Frame.KeyBind.Text, { TextColor3 = library.Settings.theme.TextColor }, 0.4).Completed:Wait()
+					library.Functions.Tween(dropdown.Frame.KeyBind.Text, { TextColor3 = library.Settings.theme.LightContrast }, 0.2)
+				end)
+
+				if library.Functions.BetterFindIndex(config, "CallBack") then
+					if dropdown.Frame.KeyBind.Visible then
+						library.Functions.BetterFindIndex(config, "CallBack")(_value)
+					end
+				end
+			end,
+		}
+		dropdown.Frame.KeyBind.MouseButton1Click:Connect(function()
+			library.Functions.Ripple(dropdown.Frame.KeyBind, 0.5)
+
+			if self.binds[dropdown].connection then
+				return update_KeyBind()
+			end
+
+			if dropdown.Frame.KeyBind.Text.Text == "None" then
+				dropdown.Frame.KeyBind.Text.Text = "..."
+
+				local key = library.Functions.KeyPressed()
+
+				update_KeyBind({ Value = key.KeyCode })
+			end
+		end)
+		dropdown.Frame.Frame.ImageButton.MouseButton1Click:Connect(function()
+			if dropdown.Frame.Frame.ImageButton.Rotation == 0 then
+				toggle(true)
+			else
+				toggle(false)
+			end
+		end)
+
+		dropdown.Frame.TextBox.Focused:Connect(function()
+			if dropdown.Frame.Frame.ImageButton.Rotation == 0 then
+				toggle(true)
+			end
+		end)
+
+		dropdown.Frame.TextBox:GetPropertyChangedSignal("Text"):Connect(function()
+			local entries = 0
+			for i, v in pairs(dropdown.List.ScrollingFrame:GetChildren()) do
+				if v:FindFirstChild("ListName") then
+					if v:FindFirstChild("ListName").Value:lower():find(dropdown.Frame.TextBox.Text:lower()) then
+						entries += 1
+						v.Visible = true
+					else
+						v.Visible = false
+					end
+				end
+			end
+			library.Functions.Tween(dropdown, {
+				Size = UDim2.new(1, 0, 0, (#list == 0 and library.Settings.Elements_Size) or library.Settings.Elements_Size + dropdown.UIListLayout.Padding.Offset + (math.clamp(entries, 0, 3) * library.Settings.Elements_Size) + (math.clamp(entries, 0, 3) * dropdown.UIListLayout.Padding.Offset)),
+			}, 0.3)
+			if entries > 3 then
+				dropdown.List.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, (entries * library.Settings.Elements_Size) + ((entries - 1) * dropdown.UIListLayout.Padding.Offset))
+				dropdown.List.ScrollingFrame.ScrollBarImageTransparency = 0
+			else
+				dropdown.List.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+				dropdown.List.ScrollingFrame.ScrollBarImageTransparency = 1
+			end
+		end)
+
+		dropdown:GetPropertyChangedSignal("Size"):Connect(function()
+			self.page:Resize()
+		end)
+
+		return { Instance = dropdown, Update = update}
+	end]]
 end
 
 return { Library = library, Discord = Discord, MongoDB = MongoDB }
