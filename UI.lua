@@ -622,6 +622,9 @@ do
 			end)
 		end
 
+		if not isfolder('Premier UI') then
+			makefolder('Premier UI')
+		end
 		if not uis.MouseIconEnabled then
 			uis.MouseIconEnabled = true
 		end
