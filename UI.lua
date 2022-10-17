@@ -2056,14 +2056,73 @@ do
 			Tween(Title.ImageButton, { Rotation = Title.Toggle.Value and 180 or 0 }, 0.2).Completed:Wait()
 			debounce = false
 		end)
+		return self
 	end
+
 	function library.section:addButton(config)
 		config = config or {}
 		local title = betterFindIndex(config, 'title')
 		local disabled = betterFindIndex(config, 'Disabled')
-		local button = newInstance('ImageButton', {
+
+		local Container = newInstance('Frame', {
 			Name = 'Button_Module',
 			Parent = (betterFindIndex(config, 'section') or 1) > #self.container and self.container[#self.container] or self.container[betterFindIndex(config, 'section') or 1],
+			Size = UDim2.new(1, 0, 0, 25),
+			BackgroundTransparency = 1,
+		}, {
+			newInstance('ImageButton', {
+				AutoButtonColor = false,
+				BackgroundTransparency = 1,
+				Size = UDim2.new(0, 14, 0, 14),
+				Position = UDim2.new(1, 0, 0, 14/2),
+				AnchorPoint = Vector2.new(1, 0),
+				Image = 'rbxassetid://7733717447',
+				ImageColor3 = library.Settings.theme.TextColor,
+				Visible = false
+			}),
+			newInstance('Frame', {
+				Name = 'Sub_Modules',
+				Size = UDim2.new(1, 0, 1, -25),
+				Position = UDim2.new(0, 0, 0, 25),
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0,
+				ClipsDescendants = true
+			}, {
+				newInstance('IntValue', {
+					Name = 'ContentSize'
+				}),
+				newInstance('Frame', {
+					Name = 'Container',
+					BackgroundTransparency = 1,
+					Size = UDim2.new(1, 0, 1, -4),
+					Position = UDim2.new(0, 0, 0, 4),
+				}, {
+					newInstance('UIListLayout', {
+						SortOrder = Enum.SortOrder.LayoutOrder,
+						Padding = UDim.new(0, 4),
+					}),
+				})
+			}),
+		})
+		local Sub_Modules_debounce
+		local Sub_Modules_Toggle = false
+		Container.ImageButton.MouseButton1Click:Connect(function()
+			if Sub_Modules_debounce then return end
+			Sub_Modules_Toggle = not Sub_Modules_Toggle
+			Sub_Modules_debounce = true
+
+			rippleEffect(Container.ImageButton, 0.5, 6)
+			Tween(Container, { Size = Sub_Modules_Toggle and UDim2.new(1, 0, 0, Container.Sub_Modules.ContentSize.Value) or UDim2.new(1, 0, 0, 25) }, 0.2)
+			Tween(Container.ImageButton, { Rotation = Sub_Modules_Toggle and 180 or 0 }, 0.2).Completed:Wait()
+
+			Sub_Modules_debounce = false
+		end)
+		Container:GetPropertyChangedSignal('AbsoluteSize'):Connect(function()
+			self:Resize()
+		end)
+		local button = newInstance('ImageButton', {
+			Name = 'Module',
+			Parent = Container,
 			BackgroundColor3 = library.Settings.theme.DarkContrast,
 			AutoButtonColor = false,
 			ClipsDescendants = true,
@@ -2088,13 +2147,6 @@ do
 				Position = UDim2.new(0.5, 0, 0.5, 0),
 				AnchorPoint = Vector2.new(0.5, 0.5),
 				ZIndex = 2
-			}),
-			newInstance('Frame', {
-				Name = 'SubModule_Container',
-				Size = UDim2.new(1, 0, 1, -25),
-				Position = UDim2.new(0, 0, 0, 25),
-				BackgroundTransparency = 1,
-				BorderSizePixel = 0,
 			}),
 			newInstance('StringValue', {
 				Name = 'SearchValue',
@@ -2165,16 +2217,74 @@ do
 			IsDisabled = IsDisabled,
 			Enabled = Enabled,
 			Update = Update,
-			Instance = button
+			Instance = button,
+			Section = self
 		}, library.module)
 	end
 	function library.section:addToggle(config)
 		config = config or {}
 		local title = betterFindIndex(config, "Title") or 'Toggle'
 		local disabled = betterFindIndex(config, 'Disabled')
+
+		local Container = newInstance('Frame', {
+			Name = 'Toggle_Module',
+			Parent = (betterFindIndex(config, 'section') or 1) > #self.container and self.container[#self.container] or self.container[betterFindIndex(config, 'section') or 1],
+			Size = UDim2.new(1, 0, 0, 25),
+			BackgroundTransparency = 1,
+		}, {
+			newInstance('ImageButton', {
+				AutoButtonColor = false,
+				BackgroundTransparency = 1,
+				Size = UDim2.new(0, 14, 0, 14),
+				Position = UDim2.new(1, 0, 0, 14/2),
+				AnchorPoint = Vector2.new(1, 0),
+				Image = 'rbxassetid://7733717447',
+				ImageColor3 = library.Settings.theme.TextColor,
+				Visible = false
+			}),
+			newInstance('Frame', {
+				Name = 'Sub_Modules',
+				Size = UDim2.new(1, 0, 1, -25),
+				Position = UDim2.new(0, 0, 0, 25),
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0,
+				ClipsDescendants = true
+			}, {
+				newInstance('IntValue', {
+					Name = 'ContentSize'
+				}),
+				newInstance('Frame', {
+					Name = 'Container',
+					BackgroundTransparency = 1,
+					Size = UDim2.new(1, 0, 1, -4),
+					Position = UDim2.new(0, 0, 0, 4),
+				}, {
+					newInstance('UIListLayout', {
+						SortOrder = Enum.SortOrder.LayoutOrder,
+						Padding = UDim.new(0, 4),
+					}),
+				})
+			}),
+		})
+		local Sub_Modules_debounce
+		local Sub_Modules_Toggle = false
+		Container.ImageButton.MouseButton1Click:Connect(function()
+			if Sub_Modules_debounce then return end
+			Sub_Modules_Toggle = not Sub_Modules_Toggle
+			Sub_Modules_debounce = true
+
+			rippleEffect(Container.ImageButton, 0.5, 6)
+			Tween(Container, { Size = Sub_Modules_Toggle and UDim2.new(1, 0, 0, Container.Sub_Modules.ContentSize.Value) or UDim2.new(1, 0, 0, 25) }, 0.2)
+			Tween(Container.ImageButton, { Rotation = Sub_Modules_Toggle and 180 or 0 }, 0.2).Completed:Wait()
+
+			Sub_Modules_debounce = false
+		end)
+		Container:GetPropertyChangedSignal('AbsoluteSize'):Connect(function()
+			self:Resize()
+		end)
 		local toggle = newInstance("ImageButton", {
-			Name = "Toggle_Module",
-			Parent = (betterFindIndex(config, "section") or 1) > #self.container and self.container[#self.container] or self.container[betterFindIndex(config, "section") or 1],
+			Name = "Module",
+			Parent = Container,
 			AutoButtonColor = false,
 			BackgroundColor3 = library.Settings.theme.DarkContrast,
 			Size = UDim2.new(1, 0, 0, 25),
@@ -2228,13 +2338,6 @@ do
 				Position = UDim2.new(0.5, 0, 0.5, 0),
 				AnchorPoint = Vector2.new(0.5, 0.5),
 				ZIndex = 2
-			}),
-			newInstance('Frame', {
-				Name = 'SubModule_Container',
-				Size = UDim2.new(1, 0, 1, -25),
-				Position = UDim2.new(0, 0, 0, 25),
-				BackgroundTransparency = 1,
-				BorderSizePixel = 0,
 			}),
 			newInstance("StringValue", {
 				Name = "SearchValue",
@@ -2334,7 +2437,8 @@ do
 			IsDisabled = IsDisabled,
 			Enabled = Enabled,
 			Update = Update,
-			Instance = toggle
+			Instance = toggle,
+			Section = self
 		}, library.module)
 	end
 	function library.section:addSlider(config)
@@ -2343,16 +2447,72 @@ do
 			return tonumber((tostring(value):gsub('%D+', '')))
 		end
 		local min = math.clamp(getNum(betterFindIndex(config, 'Min')) or 0, 0, math.huge)
-		local max = math.clamp(getNum(betterFindIndex(config, 'Max')) or 0, min, math.huge)
+		local max = math.clamp(getNum(betterFindIndex(config, 'Max')) or 1, min, math.huge)
 		local value = math.clamp(getNum(betterFindIndex(config, 'Value')) or 0, min, max)
 
 		local title = betterFindIndex(config, 'Title')
 		local disabled = betterFindIndex(config, 'Disabled')
 
-		local slider = newInstance("Frame", {
-			Name = "Slider_Module",
+		local Container = newInstance('Frame', {
+			Name = 'Slider_Module',
+			Parent = (betterFindIndex(config, 'section') or 1) > #self.container and self.container[#self.container] or self.container[betterFindIndex(config, 'section') or 1],
+			Size = UDim2.new(1, 0, 0, 25),
 			BackgroundTransparency = 1,
-			Parent = (betterFindIndex(config, "section") or 1) > #self.container and self.container[#self.container] or self.container[betterFindIndex(config, "section") or 1],
+		}, {
+			newInstance('ImageButton', {
+				AutoButtonColor = false,
+				BackgroundTransparency = 1,
+				Size = UDim2.new(0, 14, 0, 14),
+				Position = UDim2.new(1, 0, 0, 14/2),
+				AnchorPoint = Vector2.new(1, 0),
+				Image = 'rbxassetid://7733717447',
+				ImageColor3 = library.Settings.theme.TextColor,
+				Visible = false
+			}),
+			newInstance('Frame', {
+				Name = 'Sub_Modules',
+				Size = UDim2.new(1, 0, 1, -25),
+				Position = UDim2.new(0, 0, 0, 25),
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0,
+				ClipsDescendants = true
+			}, {
+				newInstance('IntValue', {
+					Name = 'ContentSize'
+				}),
+				newInstance('Frame', {
+					Name = 'Container',
+					BackgroundTransparency = 1,
+					Size = UDim2.new(1, 0, 1, -4),
+					Position = UDim2.new(0, 0, 0, 4),
+				}, {
+					newInstance('UIListLayout', {
+						SortOrder = Enum.SortOrder.LayoutOrder,
+						Padding = UDim.new(0, 4),
+					}),
+				})
+			}),
+		})
+		local Sub_Modules_debounce
+		local Sub_Modules_Toggle = false
+		Container.ImageButton.MouseButton1Click:Connect(function()
+			if Sub_Modules_debounce then return end
+			Sub_Modules_Toggle = not Sub_Modules_Toggle
+			Sub_Modules_debounce = true
+
+			rippleEffect(Container.ImageButton, 0.5, 6)
+			Tween(Container, { Size = Sub_Modules_Toggle and UDim2.new(1, 0, 0, Container.Sub_Modules.ContentSize.Value) or UDim2.new(1, 0, 0, 25) }, 0.2)
+			Tween(Container.ImageButton, { Rotation = Sub_Modules_Toggle and 180 or 0 }, 0.2).Completed:Wait()
+
+			Sub_Modules_debounce = false
+		end)
+		Container:GetPropertyChangedSignal('AbsoluteSize'):Connect(function()
+			self:Resize()
+		end)
+		local slider = newInstance("Frame", {
+			Name = "Module",
+			BackgroundTransparency = 1,
+			Parent = Container,
 			Size = UDim2.new(1, 0, 0, 25),
 		}, {
 			newInstance("TextLabel", {
@@ -2420,13 +2580,6 @@ do
 				Position = UDim2.new(0.5, 0, 0.5, 0),
 				AnchorPoint = Vector2.new(0.5, 0.5),
 				ZIndex = 2
-			}),
-			newInstance('Frame', {
-				Name = 'SubModule_Container',
-				Size = UDim2.new(1, 0, 1, -25),
-				Position = UDim2.new(0, 0, 0, 25),
-				BackgroundTransparency = 1,
-				BorderSizePixel = 0,
 			}),
 			newInstance("StringValue", {
 				Name = "SearchValue",
@@ -2534,7 +2687,8 @@ do
 			IsDisabled = IsDisabled,
 			Enabled = Enabled,
 			Update = Update,
-			Instance = slider
+			Instance = slider,
+			Section = self
 		}, library.module)
 	end
 
@@ -2542,14 +2696,31 @@ do
 		config = config or {}
 		local title = betterFindIndex(config, 'title')
 		local disabled = self.IsDisabled() or betterFindIndex(config, 'Disabled')
-		local button = newInstance('ImageButton', {
+		local container = newInstance('Frame', {
 			Name = 'Button_SubModule',
-			Parent = self.Instance['SubModule_Container'],
+			Parent = self.Instance.Parent.Sub_Modules.Container,
+			Size = UDim2.new(1, 0, 0, 25),
+			BackgroundTransparency = 1,
+		}, {
+			newInstance('ImageLabel', {
+				Image = 'rbxassetid://7733673345',
+				ImageColor3 = library.Settings.theme.TextColor,
+				BackgroundTransparency = 1,
+				Size = UDim2.new(0, 15, 0, 15),
+				Position = UDim2.new(0, 0, 0.5, 0),
+				AnchorPoint = Vector2.new(0, 0.5),
+				ZIndex = 2
+			}),
+		})
+		local button = newInstance('ImageButton', {
+			Name = 'SubModule',
+			Parent = container,
 			BackgroundColor3 = library.Settings.theme.DarkContrast,
 			AutoButtonColor = false,
 			ClipsDescendants = true,
-			Size = UDim2.new(1, 0, 0, 25),
-			LayoutOrder = 1,
+			Size = UDim2.new(1, -20, 1, 0),
+			Position = UDim2.new(1, 0, 0, 0),
+			AnchorPoint = Vector2.new(1, 0),
 		}, {
             newInstance('TextLabel', {
                 Size = UDim2.new(1, 0, 1, 0),
@@ -2572,8 +2743,17 @@ do
 			}),
 		}, UDim.new(0, betterFindIndex(config, 'Corner') or 5))
 
-		table.insert(self.modules, button)
-		self.page:Resize()
+		if not self.Instance.Parent.ImageButton.Visible then
+			Tween(self.Instance.Parent.Module, { Size = UDim2.new(1, -19, 0, self.Instance.Parent.Module.AbsoluteSize.Y) }, 0.1).Completed:Connect(function()
+				self.Instance.Parent.ImageButton.Visible = true
+			end)
+		end
+		self.Instance.Parent.Sub_Modules.ContentSize.Value = self.Instance.Parent.Module.AbsoluteSize.Y
+		for i, v in pairs(self.Instance.Parent.Sub_Modules.Container:GetChildren()) do
+			if v.Name:match('_SubModule') then
+				self.Instance.Parent.Sub_Modules.ContentSize.Value += v.AbsoluteSize.Y + 4
+			end
+		end
 
 		local function Disabled()
 			disabled = true
@@ -2627,6 +2807,403 @@ do
 		end)
 
 		return { Disabled = Disabled, Enabled = Enabled, Update = Update, Instance = button }
+	end
+	function library.module:addSlider(config)
+		config = config or {}
+		local function getNum(value)
+			return tonumber((tostring(value):gsub('%D+', '')))
+		end
+		local min = math.clamp(getNum(betterFindIndex(config, 'Min')) or 0, 0, math.huge)
+		local max = math.clamp(getNum(betterFindIndex(config, 'Max')) or 1, min, math.huge)
+		local value = math.clamp(getNum(betterFindIndex(config, 'Value')) or 0, min, max)
+
+		local title = betterFindIndex(config, 'Title')
+		local disabled = betterFindIndex(config, 'Disabled')
+
+		local container = newInstance('Frame', {
+			Name = 'Slider_SubModule',
+			Parent = self.Instance.Parent.Sub_Modules.Container,
+			Size = UDim2.new(1, 0, 0, 25),
+			BackgroundTransparency = 1,
+		}, {
+			newInstance('ImageLabel', {
+				Image = 'rbxassetid://7733673345',
+				ImageColor3 = library.Settings.theme.TextColor,
+				BackgroundTransparency = 1,
+				Size = UDim2.new(0, 15, 0, 15),
+				Position = UDim2.new(0, 0, 0.5, 0),
+				AnchorPoint = Vector2.new(0, 0.5),
+				ZIndex = 2
+			}),
+		})
+		local slider = newInstance("Frame", {
+			Name = "SubModule",
+			BackgroundTransparency = 1,
+			Parent = container,
+			Size = UDim2.new(1, -20, 1, 0),
+			Position = UDim2.new(1, 0, 0, 0),
+			AnchorPoint = Vector2.new(1, 0),
+		}, {
+			newInstance("TextLabel", {
+				BackgroundTransparency = 1,
+				Size = UDim2.new(0, getTextSize((title and title ~= '' and title) or 'Slider', 14, library.Settings.Elements_Font).X, 0, 14),
+				Font = library.Settings.Elements_Font,
+				RichText = true,
+				Text = (title and title ~= '' and title) or 'Slider',
+				TextColor3 = library.Settings.theme.TextColor,
+				TextSize = 14,
+				TextXAlignment = Enum.TextXAlignment.Left,
+			}),
+			newInstance("ImageButton", {
+				Name = "Slider",
+				BackgroundTransparency = 1,
+				Size = UDim2.new(1, 0, 0, 10),
+				AnchorPoint = Vector2.new(0, 1),
+				Position = UDim2.new(0, 0, 1, 0),
+			}, {
+				newInstance("Frame", {
+					Name = "Bar",
+					Size = UDim2.new(1, 0, 0, 3),
+					AnchorPoint = Vector2.new(0.5, 0.5),
+					Position = UDim2.new(0.5, 0, 0.5, 0),
+					BorderSizePixel = 0,
+					BackgroundColor3 = library.Settings.theme.LightContrast,
+				}, {
+					newInstance("Frame", {
+						Name = "Fill",
+						Size = UDim2.new(0, 0, 1, 0),
+						BorderSizePixel = 0,
+						BackgroundColor3 = Color3.new(1, 1, 1),
+					}, {
+						newInstance('UIGradient', {
+							Color = ColorSequence.new{
+								ColorSequenceKeypoint.new(0, Color3.fromRGB(40, 53, 221)),
+								ColorSequenceKeypoint.new(1, Color3.fromRGB(3, 156, 251))
+							},
+						}),
+						newInstance("Frame", {
+							Name = "Circle",
+							Size = UDim2.new(0, 8, 0, 8),
+							AnchorPoint = Vector2.new(1, 0.5),
+							Position = UDim2.new(1, 0, 0.5, 0),
+							BackgroundColor3 = Color3.new(1, 1, 1),
+							BorderSizePixel = 0,
+							BackgroundTransparency = 1,
+						}, {
+							newInstance('UIGradient', {
+								Color = ColorSequence.new{
+									ColorSequenceKeypoint.new(0, Color3.fromRGB(40, 53, 221)),
+									ColorSequenceKeypoint.new(1, Color3.fromRGB(3, 156, 251))
+								},
+							}),
+						}, UDim.new(1, 0)),
+					}, UDim.new(1, 0)),
+				}, UDim.new(1, 0)),
+			}),
+			newInstance('ImageLabel', {
+				Image = 'rbxassetid://7072718362',
+				ImageColor3 = library.Settings.theme.Error,
+				ImageTransparency = 1,
+				BackgroundTransparency = 1,
+				Size = UDim2.new(0, 15, 0, 15),
+				Position = UDim2.new(0.5, 0, 0.5, 0),
+				AnchorPoint = Vector2.new(0.5, 0.5),
+				ZIndex = 2
+			}),
+			newInstance("StringValue", {
+				Name = "SearchValue",
+				Value = ((title and title ~= '' and title) or 'Slider'):gsub('<[^<>]->', ''),
+			}),
+		})
+
+		if not self.Instance.Parent.ImageButton.Visible then
+			Tween(self.Instance.Parent.Module, { Size = UDim2.new(1, -19, 0, self.Instance.Parent.Module.AbsoluteSize.Y) }, 0.1).Completed:Connect(function()
+				self.Instance.Parent.ImageButton.Visible = true
+			end)
+		end
+		self.Instance.Parent.Sub_Modules.ContentSize.Value = self.Instance.Parent.Module.AbsoluteSize.Y
+		for i, v in pairs(self.Instance.Parent.Sub_Modules.Container:GetChildren()) do
+			if v.Name:match('_SubModule') then
+				self.Instance.Parent.Sub_Modules.ContentSize.Value += v.AbsoluteSize.Y + 4
+			end
+		end
+
+		local function Disabled()
+			disabled = true
+
+			Tween(slider.TextLabel, { TextTransparency = 0.5 }, 0.2)
+			Tween(slider.Slider.Bar.Fill, { BackgroundColor3 = library.Settings.theme.LightContrast }, 0.2)
+			Tween(slider.ImageLabel, { ImageTransparency = 0 }, 0.2)
+		end
+		local function IsDisabled()
+			return disabled
+		end
+		local function Enabled()
+			disabled = false
+
+			Tween(slider.TextLabel, { TextTransparency = 0 }, 0.2)
+			Tween(slider.Slider.Bar.Fill, { BackgroundColor3 = Color3.new(1, 1, 1) }, 0.2)
+			Tween(slider.ImageLabel, { ImageTransparency = 1 }, 0.2)
+		end
+		local function Update(new_config)
+			new_config = new_config or {}
+			local function limit_decimals(num, dec)
+				local num_to_string = tostring(num)
+				local separator = string.split(num_to_string, '.')
+				if not separator[2] then return num end
+
+				return tonumber(separator[1] .. '.' .. string.sub(separator[2], 1, dec))
+			end
+
+			local percent = math.clamp((mouse.X - slider.Slider.Bar.AbsolutePosition.X) / slider.Slider.Bar.AbsoluteSize.X, 0, 1)
+			for i,v in pairs(new_config) do
+				config[i] = v
+				if string.lower(tostring(i)) == 'title' then
+					slider.TextLabel.Text = v
+					slider.SearchValue.Value = v:gsub('<[^<>]->', '')
+				elseif string.lower(tostring(i)) == 'min' then
+					min = math.clamp(getNum(v) or 0, 0, math.huge)
+				elseif string.lower(tostring(i)) == 'max' then
+					max = math.clamp(getNum(v) or 0, min, math.huge)
+				elseif string.lower(tostring(i)) == 'value' then
+					value = math.clamp(getNum(v) or 0, min, max)
+
+					percent = math.clamp((value - min) / (max - min), 0, 1)
+				elseif string.lower(tostring(i)) == 'disabled' then
+					if v then
+						Disabled()
+					else
+						Enabled()
+					end
+				end
+			end
+
+			local CheckPoints = {}
+			for i = 0, (max - min) do
+				table.insert(CheckPoints, limit_decimals(i * (1 / (max - min)), 2))
+			end
+
+			if table.find(CheckPoints, limit_decimals(percent, 2)) and value ~= math.floor(min + (max - min) * percent) then
+				Tween(slider.Slider.Bar.Fill, { Size = UDim2.new(limit_decimals(percent, 2), 0, 1, 0) }, 0.05)
+				value = math.floor(min + (max - min) * percent)
+
+				if betterFindIndex(config, "CallBack") then
+					betterFindIndex(config, "CallBack")(value)
+				end
+			end
+		end
+
+		if disabled then
+			Disabled()
+		end
+		Update({ Value = value })
+
+		local dragging
+		slider.Slider.InputBegan:Connect(function(input)
+			if disabled then return end
+			if input.UserInputType == Enum.UserInputType.MouseButton1 or library.IsMobile and Enum.UserInputType.Touch then
+				dragging = true
+
+				input.Changed:Connect(function()
+					if input.UserInputState == Enum.UserInputState.End then
+						dragging = false
+					end
+				end)
+
+				Tween(slider.Slider.Bar.Fill.Circle, { BackgroundTransparency = 0 }, 0.1)
+
+				repeat task.wait()
+					Update()
+				until not dragging
+
+				Tween(slider.Slider.Bar.Fill.Circle, { BackgroundTransparency = 1 }, 0.1)
+			end
+		end)
+
+		return { Disabled = Disabled, Enabled = Enabled, Update = Update, Instance = slider }
+	end
+	function library.module:addToggle(config)
+		config = config or {}
+		local title = betterFindIndex(config, "Title") or 'Toggle'
+		local disabled = betterFindIndex(config, 'Disabled')
+
+		local container = newInstance('Frame', {
+			Name = 'Toggle_SubModule',
+			Parent = self.Instance.Parent.Sub_Modules.Container,
+			Size = UDim2.new(1, 0, 0, 25),
+			BackgroundTransparency = 1,
+		}, {
+			newInstance('ImageLabel', {
+				Image = 'rbxassetid://7733673345',
+				ImageColor3 = library.Settings.theme.TextColor,
+				BackgroundTransparency = 1,
+				Size = UDim2.new(0, 15, 0, 15),
+				Position = UDim2.new(0, 0, 0.5, 0),
+				AnchorPoint = Vector2.new(0, 0.5),
+				ZIndex = 2
+			}),
+		})
+		local toggle = newInstance("ImageButton", {
+			Name = "SubModule",
+			Parent = container,
+			AutoButtonColor = false,
+			BackgroundColor3 = library.Settings.theme.DarkContrast,
+			Size = UDim2.new(1, -20, 1, 0),
+			Position = UDim2.new(1, 0, 0, 0),
+			AnchorPoint = Vector2.new(1, 0),
+		}, {
+			newInstance('UIPadding', {
+				PaddingLeft = UDim.new(0, 10),
+				PaddingRight = UDim.new(0, 10),
+			}),
+			newInstance("TextLabel", {
+				Size = UDim2.new(1, -40, 1, 0),
+				BackgroundTransparency = 1,
+				Font = library.Settings.Elements_Font,
+				TextColor3 = library.Settings.theme.TextColor,
+				-- RichText = true,
+				Text = title,
+				TextSize = 14,
+				ClipsDescendants = true,
+				TextXAlignment = Enum.TextXAlignment.Left,
+				TextTruncate = Enum.TextTruncate.AtEnd,
+			}),
+			newInstance("Frame", {
+				BackgroundColor3 = library.Settings.theme.Background,
+				BorderSizePixel = 0,
+				Size = UDim2.new(0, 35, 0, 12),
+				Position = UDim2.new(1, 0, 0.5, 0),
+				AnchorPoint = Vector2.new(1, 0.5),
+			}, {
+				newInstance("Frame", {
+					Name = "Button",
+					BackgroundColor3 = library.Settings.theme.LightContrast,
+					Position = UDim2.new(0, 0, 0.5, 0),
+					AnchorPoint = Vector2.new(0, 0.5),
+					Size = UDim2.new(0, 14, 0, 14),
+				}, {
+					newInstance('UIGradient', {
+						Color = ColorSequence.new{
+							ColorSequenceKeypoint.new(0, Color3.fromRGB(40, 53, 221)),
+							ColorSequenceKeypoint.new(1, Color3.fromRGB(3, 156, 251))
+						},
+						Enabled = false
+					}),
+				}, UDim.new(1, 0)),
+			}, UDim.new(1, 0)),
+			newInstance('ImageLabel', {
+				Image = 'rbxassetid://7072718362',
+				ImageColor3 = library.Settings.theme.Error,
+				ImageTransparency = 1,
+				BackgroundTransparency = 1,
+				Size = UDim2.new(0, 15, 0, 15),
+				Position = UDim2.new(0.5, 0, 0.5, 0),
+				AnchorPoint = Vector2.new(0.5, 0.5),
+				ZIndex = 2
+			}),
+			newInstance("StringValue", {
+				Name = "SearchValue",
+				Value = title,
+			}),
+		}, UDim.new(0, betterFindIndex(config, "Corner") or 5))
+
+		if not self.Instance.Parent.ImageButton.Visible then
+			Tween(self.Instance.Parent.Module, { Size = UDim2.new(1, -19, 0, self.Instance.Parent.Module.AbsoluteSize.Y) }, 0.1).Completed:Connect(function()
+				self.Instance.Parent.ImageButton.Visible = true
+			end)
+		end
+		self.Instance.Parent.Sub_Modules.ContentSize.Value = self.Instance.Parent.Module.AbsoluteSize.Y
+		for i, v in pairs(self.Instance.Parent.Sub_Modules.Container:GetChildren()) do
+			if v.Name:match('_SubModule') then
+				self.Instance.Parent.Sub_Modules.ContentSize.Value += v.AbsoluteSize.Y + 4
+			end
+		end
+
+		local function Disabled()
+			disabled = true
+
+			Tween(toggle, { BackgroundTransparency = 0.5 }, 0.2)
+			Tween(toggle.Frame, { BackgroundTransparency = 0.5 }, 0.2)
+			Tween(toggle.Frame.Button, { BackgroundTransparency = 0.5 }, 0.2)
+			Tween(toggle.TextLabel, { TextTransparency = 0.5 }, 0.2)
+			Tween(toggle.ImageLabel, { ImageTransparency = 0 }, 0.2)
+		end
+		local function IsDisabled()
+			return disabled
+		end
+		local function Enabled()
+			disabled = false
+
+			Tween(toggle, { BackgroundTransparency = 0 }, 0.2)
+			Tween(toggle.Frame, { BackgroundTransparency = 0 }, 0.2)
+			Tween(toggle.Frame.Button, { BackgroundTransparency = 0 }, 0.2)
+			Tween(toggle.TextLabel, { TextTransparency = 0 }, 0.2)
+			Tween(toggle.ImageLabel, { ImageTransparency = 1 }, 0.2)
+		end
+		local function Update(new_config)
+			new_config = new_config or {}
+
+			local new_value
+			for i,v in pairs(new_config) do
+				config[i] = v
+				if string.lower(tostring(i)) == 'title' then
+					toggle.TextLabel.Text = v
+					toggle.SearchValue.Value = v
+				elseif string.lower(tostring(i)) == 'value' then
+					new_value = v
+				elseif string.lower(tostring(i)) == 'disabled' then
+					if v then
+						Disabled()
+					else
+						Enabled()
+					end
+				end
+			end
+
+			if new_value ~= nil then
+				if new_value then
+					toggle.Frame.Button.UIGradient.Enabled = true
+					toggle.Frame.Button.BackgroundColor3 = Color3.new(1, 1, 1)
+					Tween(toggle.Frame.Button, { Position = UDim2.new(1, 0, 0.5, 0), AnchorPoint = Vector2.new(1, 0.5) }, 0.3)
+
+					if betterFindIndex(config, "CallBack") then
+						betterFindIndex(config, "CallBack")(true)
+					end
+				else
+					toggle.Frame.Button.UIGradient.Enabled = false
+					toggle.Frame.Button.BackgroundColor3 = library.Settings.theme.LightContrast
+					Tween(toggle.Frame.Button, { Position = UDim2.new(0, 0, 0.5, 0), AnchorPoint = Vector2.new(0, 0.5) }, 0.3)
+
+					if betterFindIndex(config, "CallBack") then
+						betterFindIndex(config, "CallBack")(false)
+					end
+				end
+				task.wait(0.2)
+			end
+		end
+
+		if disabled then
+			Disabled()
+		end
+
+		local active = betterFindIndex(config, "Value")
+		if active then
+			Update({ value = active })
+		end
+
+		local debounce
+		toggle.MouseButton1Click:Connect(function()
+			if debounce or disabled then return end
+
+			debounce = true
+
+			active = not active
+			Update({ value = active })
+
+			debounce = false
+		end)
+
+		return { Disabled = Disabled, Enabled = Enabled, Update = Update, Instance = toggle }
 	end
 end
 
