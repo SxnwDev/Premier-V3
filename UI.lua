@@ -2645,11 +2645,11 @@ do
 				table.insert(CheckPoints, limit_decimals(i * (1 / (max - min)), 2))
 			end
 
-			if table.find(CheckPoints, limit_decimals(percent, 2)) and value ~= math.floor(min + (max - min) * percent) then
+			if table.find(CheckPoints, limit_decimals(percent, 2)) then
 				Tween(slider.Slider.Bar.Fill, { Size = UDim2.new(limit_decimals(percent, 2), 0, 1, 0) }, 0.05)
-				value = math.floor(min + (max - min) * percent)
 
-				if betterFindIndex(config, "CallBack") then
+				if betterFindIndex(config, "CallBack") and value ~= math.floor(min + (max - min) * percent) or betterFindIndex(new_config, 'value') then
+					value = math.floor(min + (max - min) * percent)
 					betterFindIndex(config, "CallBack")(value)
 				end
 			end
@@ -2808,6 +2808,186 @@ do
 
 		return { Disabled = Disabled, Enabled = Enabled, Update = Update, Instance = button }
 	end
+	function library.module:addToggle(config)
+		config = config or {}
+		local title = betterFindIndex(config, "Title") or 'Toggle'
+		local disabled = betterFindIndex(config, 'Disabled')
+
+		local container = newInstance('Frame', {
+			Name = 'Toggle_SubModule',
+			Parent = self.Instance.Parent.Sub_Modules.Container,
+			Size = UDim2.new(1, 0, 0, 25),
+			BackgroundTransparency = 1,
+		}, {
+			newInstance('ImageLabel', {
+				Image = 'rbxassetid://7733673345',
+				ImageColor3 = library.Settings.theme.TextColor,
+				BackgroundTransparency = 1,
+				Size = UDim2.new(0, 15, 0, 15),
+				Position = UDim2.new(0, 0, 0.5, 0),
+				AnchorPoint = Vector2.new(0, 0.5),
+				ZIndex = 2
+			}),
+		})
+		local toggle = newInstance("ImageButton", {
+			Name = "SubModule",
+			Parent = container,
+			AutoButtonColor = false,
+			BackgroundColor3 = library.Settings.theme.DarkContrast,
+			Size = UDim2.new(1, -20, 1, 0),
+			Position = UDim2.new(1, 0, 0, 0),
+			AnchorPoint = Vector2.new(1, 0),
+		}, {
+			newInstance('UIPadding', {
+				PaddingLeft = UDim.new(0, 10),
+				PaddingRight = UDim.new(0, 10),
+			}),
+			newInstance("TextLabel", {
+				Size = UDim2.new(1, -40, 1, 0),
+				BackgroundTransparency = 1,
+				Font = library.Settings.Elements_Font,
+				TextColor3 = library.Settings.theme.TextColor,
+				-- RichText = true,
+				Text = title,
+				TextSize = 14,
+				ClipsDescendants = true,
+				TextXAlignment = Enum.TextXAlignment.Left,
+				TextTruncate = Enum.TextTruncate.AtEnd,
+			}),
+			newInstance("Frame", {
+				BackgroundColor3 = library.Settings.theme.Background,
+				BorderSizePixel = 0,
+				Size = UDim2.new(0, 35, 0, 12),
+				Position = UDim2.new(1, 0, 0.5, 0),
+				AnchorPoint = Vector2.new(1, 0.5),
+			}, {
+				newInstance("Frame", {
+					Name = "Button",
+					BackgroundColor3 = library.Settings.theme.LightContrast,
+					Position = UDim2.new(0, 0, 0.5, 0),
+					AnchorPoint = Vector2.new(0, 0.5),
+					Size = UDim2.new(0, 14, 0, 14),
+				}, {
+					newInstance('UIGradient', {
+						Color = ColorSequence.new{
+							ColorSequenceKeypoint.new(0, Color3.fromRGB(40, 53, 221)),
+							ColorSequenceKeypoint.new(1, Color3.fromRGB(3, 156, 251))
+						},
+						Enabled = false
+					}),
+				}, UDim.new(1, 0)),
+			}, UDim.new(1, 0)),
+			newInstance('ImageLabel', {
+				Image = 'rbxassetid://7072718362',
+				ImageColor3 = library.Settings.theme.Error,
+				ImageTransparency = 1,
+				BackgroundTransparency = 1,
+				Size = UDim2.new(0, 15, 0, 15),
+				Position = UDim2.new(0.5, 0, 0.5, 0),
+				AnchorPoint = Vector2.new(0.5, 0.5),
+				ZIndex = 2
+			}),
+			newInstance("StringValue", {
+				Name = "SearchValue",
+				Value = title,
+			}),
+		}, UDim.new(0, betterFindIndex(config, "Corner") or 5))
+
+		if not self.Instance.Parent.ImageButton.Visible then
+			Tween(self.Instance.Parent.Module, { Size = UDim2.new(1, -19, 0, self.Instance.Parent.Module.AbsoluteSize.Y) }, 0.1).Completed:Connect(function()
+				self.Instance.Parent.ImageButton.Visible = true
+			end)
+		end
+		self.Instance.Parent.Sub_Modules.ContentSize.Value = self.Instance.Parent.Module.AbsoluteSize.Y
+		for i, v in pairs(self.Instance.Parent.Sub_Modules.Container:GetChildren()) do
+			if v.Name:match('_SubModule') then
+				self.Instance.Parent.Sub_Modules.ContentSize.Value += v.AbsoluteSize.Y + 4
+			end
+		end
+
+		local function Disabled()
+			disabled = true
+
+			Tween(toggle, { BackgroundTransparency = 0.5 }, 0.2)
+			Tween(toggle.Frame, { BackgroundTransparency = 0.5 }, 0.2)
+			Tween(toggle.Frame.Button, { BackgroundTransparency = 0.5 }, 0.2)
+			Tween(toggle.TextLabel, { TextTransparency = 0.5 }, 0.2)
+			Tween(toggle.ImageLabel, { ImageTransparency = 0 }, 0.2)
+		end
+		local function Enabled()
+			disabled = false
+
+			Tween(toggle, { BackgroundTransparency = 0 }, 0.2)
+			Tween(toggle.Frame, { BackgroundTransparency = 0 }, 0.2)
+			Tween(toggle.Frame.Button, { BackgroundTransparency = 0 }, 0.2)
+			Tween(toggle.TextLabel, { TextTransparency = 0 }, 0.2)
+			Tween(toggle.ImageLabel, { ImageTransparency = 1 }, 0.2)
+		end
+		local function Update(new_config)
+			new_config = new_config or {}
+
+			local new_value
+			for i,v in pairs(new_config) do
+				config[i] = v
+				if string.lower(tostring(i)) == 'title' then
+					toggle.TextLabel.Text = v
+					toggle.SearchValue.Value = v
+				elseif string.lower(tostring(i)) == 'value' then
+					new_value = v
+				elseif string.lower(tostring(i)) == 'disabled' then
+					if v then
+						Disabled()
+					else
+						Enabled()
+					end
+				end
+			end
+
+			if new_value ~= nil then
+				if new_value then
+					toggle.Frame.Button.UIGradient.Enabled = true
+					toggle.Frame.Button.BackgroundColor3 = Color3.new(1, 1, 1)
+					Tween(toggle.Frame.Button, { Position = UDim2.new(1, 0, 0.5, 0), AnchorPoint = Vector2.new(1, 0.5) }, 0.3)
+
+					if betterFindIndex(config, "CallBack") then
+						betterFindIndex(config, "CallBack")(true)
+					end
+				else
+					toggle.Frame.Button.UIGradient.Enabled = false
+					toggle.Frame.Button.BackgroundColor3 = library.Settings.theme.LightContrast
+					Tween(toggle.Frame.Button, { Position = UDim2.new(0, 0, 0.5, 0), AnchorPoint = Vector2.new(0, 0.5) }, 0.3)
+
+					if betterFindIndex(config, "CallBack") then
+						betterFindIndex(config, "CallBack")(false)
+					end
+				end
+				task.wait(0.2)
+			end
+		end
+
+		if disabled then
+			Disabled()
+		end
+
+		local active = betterFindIndex(config, "Value")
+		if active then
+			Update({ value = active })
+		end
+
+		local debounce
+		toggle.MouseButton1Click:Connect(function()
+			if debounce or disabled then return end
+
+			debounce = true
+
+			active = not active
+			Update({ value = active })
+
+			debounce = false
+		end)
+
+		return { Disabled = Disabled, Enabled = Enabled, Update = Update, Instance = toggle }
+	end
 	function library.module:addSlider(config)
 		config = config or {}
 		local function getNum(value)
@@ -2935,9 +3115,6 @@ do
 			Tween(slider.Slider.Bar.Fill, { BackgroundColor3 = library.Settings.theme.LightContrast }, 0.2)
 			Tween(slider.ImageLabel, { ImageTransparency = 0 }, 0.2)
 		end
-		local function IsDisabled()
-			return disabled
-		end
 		local function Enabled()
 			disabled = false
 
@@ -2983,11 +3160,11 @@ do
 				table.insert(CheckPoints, limit_decimals(i * (1 / (max - min)), 2))
 			end
 
-			if table.find(CheckPoints, limit_decimals(percent, 2)) and value ~= math.floor(min + (max - min) * percent) then
+			if table.find(CheckPoints, limit_decimals(percent, 2)) then
 				Tween(slider.Slider.Bar.Fill, { Size = UDim2.new(limit_decimals(percent, 2), 0, 1, 0) }, 0.05)
-				value = math.floor(min + (max - min) * percent)
 
-				if betterFindIndex(config, "CallBack") then
+				if betterFindIndex(config, "CallBack") and value ~= math.floor(min + (max - min) * percent) or betterFindIndex(new_config, 'value') then
+					value = math.floor(min + (max - min) * percent)
 					betterFindIndex(config, "CallBack")(value)
 				end
 			end
@@ -3021,189 +3198,6 @@ do
 		end)
 
 		return { Disabled = Disabled, Enabled = Enabled, Update = Update, Instance = slider }
-	end
-	function library.module:addToggle(config)
-		config = config or {}
-		local title = betterFindIndex(config, "Title") or 'Toggle'
-		local disabled = betterFindIndex(config, 'Disabled')
-
-		local container = newInstance('Frame', {
-			Name = 'Toggle_SubModule',
-			Parent = self.Instance.Parent.Sub_Modules.Container,
-			Size = UDim2.new(1, 0, 0, 25),
-			BackgroundTransparency = 1,
-		}, {
-			newInstance('ImageLabel', {
-				Image = 'rbxassetid://7733673345',
-				ImageColor3 = library.Settings.theme.TextColor,
-				BackgroundTransparency = 1,
-				Size = UDim2.new(0, 15, 0, 15),
-				Position = UDim2.new(0, 0, 0.5, 0),
-				AnchorPoint = Vector2.new(0, 0.5),
-				ZIndex = 2
-			}),
-		})
-		local toggle = newInstance("ImageButton", {
-			Name = "SubModule",
-			Parent = container,
-			AutoButtonColor = false,
-			BackgroundColor3 = library.Settings.theme.DarkContrast,
-			Size = UDim2.new(1, -20, 1, 0),
-			Position = UDim2.new(1, 0, 0, 0),
-			AnchorPoint = Vector2.new(1, 0),
-		}, {
-			newInstance('UIPadding', {
-				PaddingLeft = UDim.new(0, 10),
-				PaddingRight = UDim.new(0, 10),
-			}),
-			newInstance("TextLabel", {
-				Size = UDim2.new(1, -40, 1, 0),
-				BackgroundTransparency = 1,
-				Font = library.Settings.Elements_Font,
-				TextColor3 = library.Settings.theme.TextColor,
-				-- RichText = true,
-				Text = title,
-				TextSize = 14,
-				ClipsDescendants = true,
-				TextXAlignment = Enum.TextXAlignment.Left,
-				TextTruncate = Enum.TextTruncate.AtEnd,
-			}),
-			newInstance("Frame", {
-				BackgroundColor3 = library.Settings.theme.Background,
-				BorderSizePixel = 0,
-				Size = UDim2.new(0, 35, 0, 12),
-				Position = UDim2.new(1, 0, 0.5, 0),
-				AnchorPoint = Vector2.new(1, 0.5),
-			}, {
-				newInstance("Frame", {
-					Name = "Button",
-					BackgroundColor3 = library.Settings.theme.LightContrast,
-					Position = UDim2.new(0, 0, 0.5, 0),
-					AnchorPoint = Vector2.new(0, 0.5),
-					Size = UDim2.new(0, 14, 0, 14),
-				}, {
-					newInstance('UIGradient', {
-						Color = ColorSequence.new{
-							ColorSequenceKeypoint.new(0, Color3.fromRGB(40, 53, 221)),
-							ColorSequenceKeypoint.new(1, Color3.fromRGB(3, 156, 251))
-						},
-						Enabled = false
-					}),
-				}, UDim.new(1, 0)),
-			}, UDim.new(1, 0)),
-			newInstance('ImageLabel', {
-				Image = 'rbxassetid://7072718362',
-				ImageColor3 = library.Settings.theme.Error,
-				ImageTransparency = 1,
-				BackgroundTransparency = 1,
-				Size = UDim2.new(0, 15, 0, 15),
-				Position = UDim2.new(0.5, 0, 0.5, 0),
-				AnchorPoint = Vector2.new(0.5, 0.5),
-				ZIndex = 2
-			}),
-			newInstance("StringValue", {
-				Name = "SearchValue",
-				Value = title,
-			}),
-		}, UDim.new(0, betterFindIndex(config, "Corner") or 5))
-
-		if not self.Instance.Parent.ImageButton.Visible then
-			Tween(self.Instance.Parent.Module, { Size = UDim2.new(1, -19, 0, self.Instance.Parent.Module.AbsoluteSize.Y) }, 0.1).Completed:Connect(function()
-				self.Instance.Parent.ImageButton.Visible = true
-			end)
-		end
-		self.Instance.Parent.Sub_Modules.ContentSize.Value = self.Instance.Parent.Module.AbsoluteSize.Y
-		for i, v in pairs(self.Instance.Parent.Sub_Modules.Container:GetChildren()) do
-			if v.Name:match('_SubModule') then
-				self.Instance.Parent.Sub_Modules.ContentSize.Value += v.AbsoluteSize.Y + 4
-			end
-		end
-
-		local function Disabled()
-			disabled = true
-
-			Tween(toggle, { BackgroundTransparency = 0.5 }, 0.2)
-			Tween(toggle.Frame, { BackgroundTransparency = 0.5 }, 0.2)
-			Tween(toggle.Frame.Button, { BackgroundTransparency = 0.5 }, 0.2)
-			Tween(toggle.TextLabel, { TextTransparency = 0.5 }, 0.2)
-			Tween(toggle.ImageLabel, { ImageTransparency = 0 }, 0.2)
-		end
-		local function IsDisabled()
-			return disabled
-		end
-		local function Enabled()
-			disabled = false
-
-			Tween(toggle, { BackgroundTransparency = 0 }, 0.2)
-			Tween(toggle.Frame, { BackgroundTransparency = 0 }, 0.2)
-			Tween(toggle.Frame.Button, { BackgroundTransparency = 0 }, 0.2)
-			Tween(toggle.TextLabel, { TextTransparency = 0 }, 0.2)
-			Tween(toggle.ImageLabel, { ImageTransparency = 1 }, 0.2)
-		end
-		local function Update(new_config)
-			new_config = new_config or {}
-
-			local new_value
-			for i,v in pairs(new_config) do
-				config[i] = v
-				if string.lower(tostring(i)) == 'title' then
-					toggle.TextLabel.Text = v
-					toggle.SearchValue.Value = v
-				elseif string.lower(tostring(i)) == 'value' then
-					new_value = v
-				elseif string.lower(tostring(i)) == 'disabled' then
-					if v then
-						Disabled()
-					else
-						Enabled()
-					end
-				end
-			end
-
-			if new_value ~= nil then
-				if new_value then
-					toggle.Frame.Button.UIGradient.Enabled = true
-					toggle.Frame.Button.BackgroundColor3 = Color3.new(1, 1, 1)
-					Tween(toggle.Frame.Button, { Position = UDim2.new(1, 0, 0.5, 0), AnchorPoint = Vector2.new(1, 0.5) }, 0.3)
-
-					if betterFindIndex(config, "CallBack") then
-						betterFindIndex(config, "CallBack")(true)
-					end
-				else
-					toggle.Frame.Button.UIGradient.Enabled = false
-					toggle.Frame.Button.BackgroundColor3 = library.Settings.theme.LightContrast
-					Tween(toggle.Frame.Button, { Position = UDim2.new(0, 0, 0.5, 0), AnchorPoint = Vector2.new(0, 0.5) }, 0.3)
-
-					if betterFindIndex(config, "CallBack") then
-						betterFindIndex(config, "CallBack")(false)
-					end
-				end
-				task.wait(0.2)
-			end
-		end
-
-		if disabled then
-			Disabled()
-		end
-
-		local active = betterFindIndex(config, "Value")
-		if active then
-			Update({ value = active })
-		end
-
-		local debounce
-		toggle.MouseButton1Click:Connect(function()
-			if debounce or disabled then return end
-
-			debounce = true
-
-			active = not active
-			Update({ value = active })
-
-			debounce = false
-		end)
-
-		return { Disabled = Disabled, Enabled = Enabled, Update = Update, Instance = toggle }
 	end
 end
 
