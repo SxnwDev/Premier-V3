@@ -34,6 +34,7 @@ local library = {
 	functions = {},
 	page = {},
 	section = {},
+	module = {},
 	notifications = {},
 
 	binds = {},
@@ -56,168 +57,6 @@ table.insert(library.end_funcs, function()
         library.binds[i] = nil
     end
 end)
-
--- encode/decode - save/load function
-do
-	local types = {
-		['nil'] = '0',
-		['boolean'] = '1',
-		['number'] = '2',
-		['string'] = '3',
-		['table'] = '4',
-
-		['Vector3'] = '5',
-		['CFrame'] = '6',
-		['EnumItem'] = '7',
-		['Color3'] = '8',
-
-		-- ['function'] = '10',
-	}
-	local typeof = typeof or type
-	function library.encode(data)
-		if data == nil then
-			return
-		end
-		local function encode(t, ...)
-			local type = typeof(t)
-			local type_num = types[type]
-			local response = ''
-
-			if type == 'nil' then
-				response = type_num .. '=' .. '0'
-			elseif type == 'boolean' then
-				response = type_num .. '=' .. ((t == true and '1') or '0')
-			elseif type == 'number' then
-				response = type_num .. '=' .. tostring(t)
-			elseif type == 'string' then
-				response = type_num .. '=' .. tostring(t)
-			elseif type == 'table' then
-				local new = {}
-				for i, v in pairs(t) do
-					local value = encode(v)
-					if typeof(value) == 'table' then
-						new[i] = game:GetService('HttpService'):JSONEncode(value)
-					else
-						new[i] = value
-					end
-				end
-				return new
-			elseif type == 'Vector3' then
-				response = type_num .. '=' .. table.concat({tostring(t.X), tostring(t.Y), tostring(t.Z)}, ',')
-			elseif type == 'CFrame' then
-				response = type_num .. '=' .. table.concat({t:GetComponents()}, ',')
-			elseif type == 'EnumItem' then
-				response = type_num .. '=' .. tostring(table.find(Enum:GetEnums(), t.EnumType)) .. '-' .. t.Name
-			elseif type == 'Color3' then
-				response = type_num .. '=' .. table.concat({tostring(t.R), tostring(t.G), tostring(t.B)}, ',')
-			end
-			return response
-		end
-
-		return game:GetService('HttpService'):JSONEncode(encode(data))
-	end
-	function library.decode(data)
-		if data == nil then
-			return
-		end
-		local rtypes = {}
-		for i, v in pairs(types) do
-			rtypes[v] = i
-		end
-		local function decode(t, ...)
-			local function getType()
-				local encode_value = t
-				pcall(function ()
-					encode_value = game:GetService('HttpService'):JSONDecode(encode_value)
-				end)
-				if typeof(encode_value) == 'table' then
-					return 'table'
-				else
-					return rtypes[string.sub(encode_value, 1, (string.find(encode_value, '=') or 1) - 1)]
-				end
-			end
-			local function getValue()
-				local encode_value = t
-				pcall(function ()
-					encode_value = game:GetService('HttpService'):JSONDecode(encode_value)
-				end)
-				return string.sub(encode_value, string.find(encode_value, '=') + 1, #encode_value)
-			end
-			local function get_after(str, value)
-				return string.sub(str, string.find(str, value) + 1, #str)
-			end
-			local function get_before(str, value)
-				return string.sub(str, 1, string.find(str, value) - 1)
-			end
-
-			local response
-			if getType() == 'nil' then
-				response = nil
-			elseif getType() == 'boolean' then
-				response = getValue() == '1' and true or false
-			elseif getType() == 'number' then
-				response = getValue()
-			elseif getType() == 'string' then
-				response = getValue()
-			elseif getType() == 'table' then
-				local function stringToTable(value)
-					pcall(function ()
-						value = game:GetService('HttpService'):JSONDecode(value)
-					end)
-					local new_table = {}
-					for i, v in pairs(value) do
-						local new_value
-						pcall(function ()
-							new_value = game:GetService('HttpService'):JSONDecode(v)
-						end)
-						if typeof(new_value) == 'table' then
-							new_table[i] = stringToTable(v)
-						else
-							new_table[i] = decode(v)
-						end
-					end
-					return new_table
-				end
-				response = stringToTable(t)
-			elseif getType() == 'Vector3' then
-				response = Vector3.new(table.unpack(string.split(getValue(), ',')))
-			elseif getType() == 'CFrame' then
-				response = CFrame.new(table.unpack(string.split(getValue(), ',')))
-			elseif getType() == 'EnumItem' then
-				local value = getValue()
-				response = Enum:GetEnums()[tonumber(get_before(value, '-'))][get_after(value, '-')]
-			elseif getType() == 'Color3' then
-				response = Color3.new(table.unpack(string.split(getValue(), ',')))
-			end
-
-			return response
-		end
-
-		return decode(data)
-	end
-
-	function library.Save(config)
-		if writefile then
-			writefile('Premier UI/Settings.lua', library.encode(config))
-		end
-	end
-	function library.Load()
-		if isfile and readfile then
-			if isfile('Premier UI/Settings.lua') then
-				local function loadSettings(tbl, loadIn)
-					for i, v in pairs(tbl) do
-						if typeof(v) ~= 'table' then
-							loadIn[i] = v
-						else
-							loadSettings(v, loadIn[i])
-						end
-					end
-				end
-				loadSettings(library.decode(readfile('Premier UI/Settings.lua')), library)
-			end
-		end
-	end
-end
 
 local AssetToLoad = {}
 do
@@ -609,6 +448,7 @@ do
 	library.__index = library
 	library.page.__index = library.page
 	library.section.__index = library.section
+	library.module.__index = library.module
 
 	function library.new()
 		local function check()
@@ -631,7 +471,7 @@ do
 
 		table.insert(library.connections, player.Idled:Connect(function()
 			pcall(function()
-				game:service('VirtualUser'):ClickButton2(Vector2.new())
+				game:GetService('VirtualUser'):ClickButton2(Vector2.new())
 			end)
 		end))
 
@@ -2220,7 +2060,7 @@ do
 	function library.section:addButton(config)
 		config = config or {}
 		local title = betterFindIndex(config, 'title')
-		local disabled = betterFindIndex(config, 'Disabled') or false
+		local disabled = betterFindIndex(config, 'Disabled')
 		local button = newInstance('ImageButton', {
 			Name = 'Button_Module',
 			Parent = (betterFindIndex(config, 'section') or 1) > #self.container and self.container[#self.container] or self.container[betterFindIndex(config, 'section') or 1],
@@ -2249,9 +2089,486 @@ do
 				AnchorPoint = Vector2.new(0.5, 0.5),
 				ZIndex = 2
 			}),
+			newInstance('Frame', {
+				Name = 'SubModule_Container',
+				Size = UDim2.new(1, 0, 1, -25),
+				Position = UDim2.new(0, 0, 0, 25),
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0,
+			}),
 			newInstance('StringValue', {
 				Name = 'SearchValue',
 				Value = ((title and title ~= '' and title) or 'Button'):gsub('<[^<>]->', ''),
+			})
+		}, UDim.new(0, betterFindIndex(config, 'Corner') or 5))
+
+		table.insert(self.modules, button)
+		self.page:Resize()
+
+		local function Disabled()
+			disabled = true
+
+			Tween(button, { BackgroundTransparency = 0.5 }, 0.2)
+			Tween(button.TextLabel, { TextTransparency = 0.5 }, 0.2)
+			Tween(button.ImageLabel, { ImageTransparency = 0 }, 0.2)
+		end
+		local function IsDisabled()
+			return disabled
+		end
+		local function Enabled()
+			disabled = false
+
+			Tween(button, { BackgroundTransparency = 0 }, 0.2)
+			Tween(button.TextLabel, { TextTransparency = 0 }, 0.2)
+			Tween(button.ImageLabel, { ImageTransparency = 1 }, 0.2)
+		end
+		local function Update(new_config)
+			new_config = new_config or {}
+			for i,v in pairs(new_config) do
+				config[i] = v
+				if string.lower(tostring(i)) == 'title' then
+					button.TextLabel.Text = v
+					button.SearchValue.Value = v:gsub('<[^<>]->', '')
+				elseif  string.lower(tostring(i)) == 'disabled' then
+					if v then
+						Disabled()
+					else
+						Enabled()
+					end
+				end
+			end
+		end
+
+		if disabled then
+			Disabled()
+		end
+
+		local debounce
+		button.MouseButton1Click:Connect(function()
+			if debounce or disabled then return end
+
+			rippleEffect(button, 0.5)
+
+			debounce = true
+
+			Tween(button, { BackgroundTransparency = 0.5 }, 0.2)
+			if betterFindIndex(config, 'CallBack') then
+				betterFindIndex(config, 'CallBack')()
+			end
+			Tween(button, { BackgroundTransparency = 0 }, 0.2)
+
+			debounce = false
+		end)
+
+		return setmetatable({
+			Disabled = Disabled,
+			IsDisabled = IsDisabled,
+			Enabled = Enabled,
+			Update = Update,
+			Instance = button
+		}, library.module)
+	end
+	function library.section:addToggle(config)
+		config = config or {}
+		local title = betterFindIndex(config, "Title") or 'Toggle'
+		local disabled = betterFindIndex(config, 'Disabled')
+		local toggle = newInstance("ImageButton", {
+			Name = "Toggle_Module",
+			Parent = (betterFindIndex(config, "section") or 1) > #self.container and self.container[#self.container] or self.container[betterFindIndex(config, "section") or 1],
+			AutoButtonColor = false,
+			BackgroundColor3 = library.Settings.theme.DarkContrast,
+			Size = UDim2.new(1, 0, 0, 25),
+			LayoutOrder = 1,
+		}, {
+			newInstance('UIPadding', {
+				PaddingLeft = UDim.new(0, 10),
+				PaddingRight = UDim.new(0, 10),
+			}),
+			newInstance("TextLabel", {
+				Size = UDim2.new(1, -40, 1, 0),
+				BackgroundTransparency = 1,
+				Font = library.Settings.Elements_Font,
+				TextColor3 = library.Settings.theme.TextColor,
+				-- RichText = true,
+				Text = title,
+				TextSize = 14,
+				ClipsDescendants = true,
+				TextXAlignment = Enum.TextXAlignment.Left,
+				TextTruncate = Enum.TextTruncate.AtEnd,
+			}),
+			newInstance("Frame", {
+				BackgroundColor3 = library.Settings.theme.Background,
+				BorderSizePixel = 0,
+				Size = UDim2.new(0, 35, 0, 12),
+				Position = UDim2.new(1, 0, 0.5, 0),
+				AnchorPoint = Vector2.new(1, 0.5),
+			}, {
+				newInstance("Frame", {
+					Name = "Button",
+					BackgroundColor3 = library.Settings.theme.LightContrast,
+					Position = UDim2.new(0, 0, 0.5, 0),
+					AnchorPoint = Vector2.new(0, 0.5),
+					Size = UDim2.new(0, 14, 0, 14),
+				}, {
+					newInstance('UIGradient', {
+						Color = ColorSequence.new{
+							ColorSequenceKeypoint.new(0, Color3.fromRGB(40, 53, 221)),
+							ColorSequenceKeypoint.new(1, Color3.fromRGB(3, 156, 251))
+						},
+						Enabled = false
+					}),
+				}, UDim.new(1, 0)),
+			}, UDim.new(1, 0)),
+			newInstance('ImageLabel', {
+				Image = 'rbxassetid://7072718362',
+				ImageColor3 = library.Settings.theme.Error,
+				ImageTransparency = 1,
+				BackgroundTransparency = 1,
+				Size = UDim2.new(0, 15, 0, 15),
+				Position = UDim2.new(0.5, 0, 0.5, 0),
+				AnchorPoint = Vector2.new(0.5, 0.5),
+				ZIndex = 2
+			}),
+			newInstance('Frame', {
+				Name = 'SubModule_Container',
+				Size = UDim2.new(1, 0, 1, -25),
+				Position = UDim2.new(0, 0, 0, 25),
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0,
+			}),
+			newInstance("StringValue", {
+				Name = "SearchValue",
+				Value = title,
+			}),
+		}, UDim.new(0, betterFindIndex(config, "Corner") or 5))
+
+		table.insert(self.modules, toggle)
+		self.page:Resize()
+
+		local function Disabled()
+			disabled = true
+
+			Tween(toggle, { BackgroundTransparency = 0.5 }, 0.2)
+			Tween(toggle.Frame, { BackgroundTransparency = 0.5 }, 0.2)
+			Tween(toggle.Frame.Button, { BackgroundTransparency = 0.5 }, 0.2)
+			Tween(toggle.TextLabel, { TextTransparency = 0.5 }, 0.2)
+			Tween(toggle.ImageLabel, { ImageTransparency = 0 }, 0.2)
+		end
+		local function IsDisabled()
+			return disabled
+		end
+		local function Enabled()
+			disabled = false
+
+			Tween(toggle, { BackgroundTransparency = 0 }, 0.2)
+			Tween(toggle.Frame, { BackgroundTransparency = 0 }, 0.2)
+			Tween(toggle.Frame.Button, { BackgroundTransparency = 0 }, 0.2)
+			Tween(toggle.TextLabel, { TextTransparency = 0 }, 0.2)
+			Tween(toggle.ImageLabel, { ImageTransparency = 1 }, 0.2)
+		end
+		local function Update(new_config)
+			new_config = new_config or {}
+
+			local new_value
+			for i,v in pairs(new_config) do
+				config[i] = v
+				if string.lower(tostring(i)) == 'title' then
+					toggle.TextLabel.Text = v
+					toggle.SearchValue.Value = v
+				elseif string.lower(tostring(i)) == 'value' then
+					new_value = v
+				elseif string.lower(tostring(i)) == 'disabled' then
+					if v then
+						Disabled()
+					else
+						Enabled()
+					end
+				end
+			end
+
+			if new_value ~= nil then
+				if new_value then
+					toggle.Frame.Button.UIGradient.Enabled = true
+					toggle.Frame.Button.BackgroundColor3 = Color3.new(1, 1, 1)
+					Tween(toggle.Frame.Button, { Position = UDim2.new(1, 0, 0.5, 0), AnchorPoint = Vector2.new(1, 0.5) }, 0.3)
+
+					if betterFindIndex(config, "CallBack") then
+						betterFindIndex(config, "CallBack")(true)
+					end
+				else
+					toggle.Frame.Button.UIGradient.Enabled = false
+					toggle.Frame.Button.BackgroundColor3 = library.Settings.theme.LightContrast
+					Tween(toggle.Frame.Button, { Position = UDim2.new(0, 0, 0.5, 0), AnchorPoint = Vector2.new(0, 0.5) }, 0.3)
+
+					if betterFindIndex(config, "CallBack") then
+						betterFindIndex(config, "CallBack")(false)
+					end
+				end
+				task.wait(0.2)
+			end
+		end
+
+		if disabled then
+			Disabled()
+		end
+
+		local active = betterFindIndex(config, "Value")
+		if active then
+			Update({ value = active })
+		end
+
+		local debounce
+		toggle.MouseButton1Click:Connect(function()
+			if debounce or disabled then return end
+
+			debounce = true
+
+			active = not active
+			Update({ value = active })
+
+			debounce = false
+		end)
+
+		return setmetatable({
+			Disabled = Disabled,
+			IsDisabled = IsDisabled,
+			Enabled = Enabled,
+			Update = Update,
+			Instance = toggle
+		}, library.module)
+	end
+	function library.section:addSlider(config)
+		config = config or {}
+		local function getNum(value)
+			return tonumber((tostring(value):gsub('%D+', '')))
+		end
+		local min = math.clamp(getNum(betterFindIndex(config, 'Min')) or 0, 0, math.huge)
+		local max = math.clamp(getNum(betterFindIndex(config, 'Max')) or 0, min, math.huge)
+		local value = math.clamp(getNum(betterFindIndex(config, 'Value')) or 0, min, max)
+
+		local title = betterFindIndex(config, 'Title')
+		local disabled = betterFindIndex(config, 'Disabled')
+
+		local slider = newInstance("Frame", {
+			Name = "Slider_Module",
+			BackgroundTransparency = 1,
+			Parent = (betterFindIndex(config, "section") or 1) > #self.container and self.container[#self.container] or self.container[betterFindIndex(config, "section") or 1],
+			Size = UDim2.new(1, 0, 0, 25),
+		}, {
+			newInstance("TextLabel", {
+				BackgroundTransparency = 1,
+				Size = UDim2.new(0, getTextSize((title and title ~= '' and title) or 'Slider', 14, library.Settings.Elements_Font).X, 0, 14),
+				Font = library.Settings.Elements_Font,
+				RichText = true,
+				Text = (title and title ~= '' and title) or 'Slider',
+				TextColor3 = library.Settings.theme.TextColor,
+				TextSize = 14,
+				TextXAlignment = Enum.TextXAlignment.Left,
+			}),
+			newInstance("ImageButton", {
+				Name = "Slider",
+				BackgroundTransparency = 1,
+				Size = UDim2.new(1, 0, 0, 10),
+				AnchorPoint = Vector2.new(0, 1),
+				Position = UDim2.new(0, 0, 1, 0),
+			}, {
+				newInstance("Frame", {
+					Name = "Bar",
+					Size = UDim2.new(1, 0, 0, 3),
+					AnchorPoint = Vector2.new(0.5, 0.5),
+					Position = UDim2.new(0.5, 0, 0.5, 0),
+					BorderSizePixel = 0,
+					BackgroundColor3 = library.Settings.theme.LightContrast,
+				}, {
+					newInstance("Frame", {
+						Name = "Fill",
+						Size = UDim2.new(0, 0, 1, 0),
+						BorderSizePixel = 0,
+						BackgroundColor3 = Color3.new(1, 1, 1),
+					}, {
+						newInstance('UIGradient', {
+							Color = ColorSequence.new{
+								ColorSequenceKeypoint.new(0, Color3.fromRGB(40, 53, 221)),
+								ColorSequenceKeypoint.new(1, Color3.fromRGB(3, 156, 251))
+							},
+						}),
+						newInstance("Frame", {
+							Name = "Circle",
+							Size = UDim2.new(0, 8, 0, 8),
+							AnchorPoint = Vector2.new(1, 0.5),
+							Position = UDim2.new(1, 0, 0.5, 0),
+							BackgroundColor3 = Color3.new(1, 1, 1),
+							BorderSizePixel = 0,
+							BackgroundTransparency = 1,
+						}, {
+							newInstance('UIGradient', {
+								Color = ColorSequence.new{
+									ColorSequenceKeypoint.new(0, Color3.fromRGB(40, 53, 221)),
+									ColorSequenceKeypoint.new(1, Color3.fromRGB(3, 156, 251))
+								},
+							}),
+						}, UDim.new(1, 0)),
+					}, UDim.new(1, 0)),
+				}, UDim.new(1, 0)),
+			}),
+			newInstance('ImageLabel', {
+				Image = 'rbxassetid://7072718362',
+				ImageColor3 = library.Settings.theme.Error,
+				ImageTransparency = 1,
+				BackgroundTransparency = 1,
+				Size = UDim2.new(0, 15, 0, 15),
+				Position = UDim2.new(0.5, 0, 0.5, 0),
+				AnchorPoint = Vector2.new(0.5, 0.5),
+				ZIndex = 2
+			}),
+			newInstance('Frame', {
+				Name = 'SubModule_Container',
+				Size = UDim2.new(1, 0, 1, -25),
+				Position = UDim2.new(0, 0, 0, 25),
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0,
+			}),
+			newInstance("StringValue", {
+				Name = "SearchValue",
+				Value = ((title and title ~= '' and title) or 'Slider'):gsub('<[^<>]->', ''),
+			}),
+		})
+
+		table.insert(self.modules, slider)
+		self.page:Resize()
+
+		local function Disabled()
+			disabled = true
+
+			Tween(slider.TextLabel, { TextTransparency = 0.5 }, 0.2)
+			Tween(slider.Slider.Bar.Fill, { BackgroundColor3 = library.Settings.theme.LightContrast }, 0.2)
+			Tween(slider.ImageLabel, { ImageTransparency = 0 }, 0.2)
+		end
+		local function IsDisabled()
+			return disabled
+		end
+		local function Enabled()
+			disabled = false
+
+			Tween(slider.TextLabel, { TextTransparency = 0 }, 0.2)
+			Tween(slider.Slider.Bar.Fill, { BackgroundColor3 = Color3.new(1, 1, 1) }, 0.2)
+			Tween(slider.ImageLabel, { ImageTransparency = 1 }, 0.2)
+		end
+		local function Update(new_config)
+			new_config = new_config or {}
+			local function limit_decimals(num, dec)
+				local num_to_string = tostring(num)
+				local separator = string.split(num_to_string, '.')
+				if not separator[2] then return num end
+
+				return tonumber(separator[1] .. '.' .. string.sub(separator[2], 1, dec))
+			end
+
+			local percent = math.clamp((mouse.X - slider.Slider.Bar.AbsolutePosition.X) / slider.Slider.Bar.AbsoluteSize.X, 0, 1)
+			for i,v in pairs(new_config) do
+				config[i] = v
+				if string.lower(tostring(i)) == 'title' then
+					slider.TextLabel.Text = v
+					slider.SearchValue.Value = v:gsub('<[^<>]->', '')
+				elseif string.lower(tostring(i)) == 'min' then
+					min = math.clamp(getNum(v) or 0, 0, math.huge)
+				elseif string.lower(tostring(i)) == 'max' then
+					max = math.clamp(getNum(v) or 0, min, math.huge)
+				elseif string.lower(tostring(i)) == 'value' then
+					value = math.clamp(getNum(v) or 0, min, max)
+
+					percent = math.clamp((value - min) / (max - min), 0, 1)
+				elseif string.lower(tostring(i)) == 'disabled' then
+					if v then
+						Disabled()
+					else
+						Enabled()
+					end
+				end
+			end
+
+			local CheckPoints = {}
+			for i = 0, (max - min) do
+				table.insert(CheckPoints, limit_decimals(i * (1 / (max - min)), 2))
+			end
+
+			if table.find(CheckPoints, limit_decimals(percent, 2)) and value ~= math.floor(min + (max - min) * percent) then
+				Tween(slider.Slider.Bar.Fill, { Size = UDim2.new(limit_decimals(percent, 2), 0, 1, 0) }, 0.05)
+				value = math.floor(min + (max - min) * percent)
+
+				if betterFindIndex(config, "CallBack") then
+					betterFindIndex(config, "CallBack")(value)
+				end
+			end
+		end
+
+		if disabled then
+			Disabled()
+		end
+		Update({ Value = value })
+
+		local dragging
+		slider.Slider.InputBegan:Connect(function(input)
+			if disabled then return end
+			if input.UserInputType == Enum.UserInputType.MouseButton1 or library.IsMobile and Enum.UserInputType.Touch then
+				dragging = true
+
+				input.Changed:Connect(function()
+					if input.UserInputState == Enum.UserInputState.End then
+						dragging = false
+					end
+				end)
+
+				Tween(slider.Slider.Bar.Fill.Circle, { BackgroundTransparency = 0 }, 0.1)
+
+				repeat task.wait()
+					Update()
+				until not dragging
+
+				Tween(slider.Slider.Bar.Fill.Circle, { BackgroundTransparency = 1 }, 0.1)
+			end
+		end)
+
+		return setmetatable({
+			Disabled = Disabled,
+			IsDisabled = IsDisabled,
+			Enabled = Enabled,
+			Update = Update,
+			Instance = slider
+		}, library.module)
+	end
+
+	function library.module:addButton(config)
+		config = config or {}
+		local title = betterFindIndex(config, 'title')
+		local disabled = self.IsDisabled() or betterFindIndex(config, 'Disabled')
+		local button = newInstance('ImageButton', {
+			Name = 'Button_SubModule',
+			Parent = self.Instance['SubModule_Container'],
+			BackgroundColor3 = library.Settings.theme.DarkContrast,
+			AutoButtonColor = false,
+			ClipsDescendants = true,
+			Size = UDim2.new(1, 0, 0, 25),
+			LayoutOrder = 1,
+		}, {
+            newInstance('TextLabel', {
+                Size = UDim2.new(1, 0, 1, 0),
+                BackgroundTransparency = 1,
+                Text = (title and title ~= '' and title) or 'Button',
+                Font = library.Settings.Elements_Font,
+				TextSize = 14,
+                RichText = true,
+                TextColor3 = library.Settings.theme.TextColor,
+            }),
+			newInstance('ImageLabel', {
+				Image = 'rbxassetid://7072718362',
+				ImageColor3 = library.Settings.theme.Error,
+				ImageTransparency = 1,
+				BackgroundTransparency = 1,
+				Size = UDim2.new(0, 15, 0, 15),
+				Position = UDim2.new(0.5, 0, 0.5, 0),
+				AnchorPoint = Vector2.new(0.5, 0.5),
+				ZIndex = 2
 			}),
 		}, UDim.new(0, betterFindIndex(config, 'Corner') or 5))
 
@@ -2310,160 +2627,6 @@ do
 		end)
 
 		return { Disabled = Disabled, Enabled = Enabled, Update = Update, Instance = button }
-	end
-	function library.section:addToggle(config)
-		config = config or {}
-		local title = betterFindIndex(config, "Title") or 'Toggle'
-		local disabled = betterFindIndex(config, 'Disabled') or false
-		local toggle = newInstance("ImageButton", {
-			Name = "Toggle_Module",
-			Parent = (betterFindIndex(config, "section") or 1) > #self.container and self.container[#self.container] or self.container[betterFindIndex(config, "section") or 1],
-			AutoButtonColor = false,
-			BackgroundColor3 = library.Settings.theme.DarkContrast,
-			Size = UDim2.new(1, 0, 0, 25),
-			LayoutOrder = 1,
-		}, {
-			newInstance('UIPadding', {
-				PaddingLeft = UDim.new(0, 10),
-				PaddingRight = UDim.new(0, 10),
-			}),
-			newInstance("TextLabel", {
-				Size = UDim2.new(1, -40, 1, 0),
-				BackgroundTransparency = 1,
-				Font = library.Settings.Elements_Font,
-				TextColor3 = library.Settings.theme.TextColor,
-				-- RichText = true,
-				Text = title,
-				TextSize = 14,
-				ClipsDescendants = true,
-				TextXAlignment = Enum.TextXAlignment.Left,
-				TextTruncate = Enum.TextTruncate.AtEnd,
-			}),
-			newInstance("Frame", {
-				BackgroundColor3 = library.Settings.theme.Background,
-				BorderSizePixel = 0,
-				Size = UDim2.new(0, 35, 0, 12),
-				Position = UDim2.new(1, 0, 0.5, 0),
-				AnchorPoint = Vector2.new(1, 0.5),
-			}, {
-				newInstance("Frame", {
-					Name = "Button",
-					BackgroundColor3 = library.Settings.theme.LightContrast,
-					Position = UDim2.new(0, 0, 0.5, 0),
-					AnchorPoint = Vector2.new(0, 0.5),
-					Size = UDim2.new(0, 14, 0, 14),
-				}, {
-					newInstance('UIGradient', {
-						Color = ColorSequence.new{
-							ColorSequenceKeypoint.new(0, Color3.fromRGB(40, 53, 221)),
-							ColorSequenceKeypoint.new(1, Color3.fromRGB(3, 156, 251))
-						},
-						Enabled = false
-					}),
-				}, UDim.new(1, 0)),
-			}, UDim.new(1, 0)),
-			newInstance('ImageLabel', {
-				Image = 'rbxassetid://7072718362',
-				ImageColor3 = library.Settings.theme.Error,
-				ImageTransparency = 1,
-				BackgroundTransparency = 1,
-				Size = UDim2.new(0, 15, 0, 15),
-				Position = UDim2.new(0.5, 0, 0.5, 0),
-				AnchorPoint = Vector2.new(0.5, 0.5),
-				ZIndex = 2
-			}),
-			newInstance("StringValue", {
-				Name = "SearchValue",
-				Value = title,
-			}),
-		}, UDim.new(0, betterFindIndex(config, "Corner") or 5))
-
-		table.insert(self.modules, toggle)
-		self.page:Resize()
-
-		local function Disabled()
-			disabled = true
-
-			Tween(toggle, { BackgroundTransparency = 0.5 }, 0.2)
-			Tween(toggle.Frame, { BackgroundTransparency = 0.5 }, 0.2)
-			Tween(toggle.Frame.Button, { BackgroundTransparency = 0.5 }, 0.2)
-			Tween(toggle.TextLabel, { TextTransparency = 0.5 }, 0.2)
-			Tween(toggle.ImageLabel, { ImageTransparency = 0 }, 0.2)
-		end
-		local function Enabled()
-			disabled = false
-
-			Tween(toggle, { BackgroundTransparency = 0 }, 0.2)
-			Tween(toggle.Frame, { BackgroundTransparency = 0 }, 0.2)
-			Tween(toggle.Frame.Button, { BackgroundTransparency = 0 }, 0.2)
-			Tween(toggle.TextLabel, { TextTransparency = 0 }, 0.2)
-			Tween(toggle.ImageLabel, { ImageTransparency = 1 }, 0.2)
-		end
-		local function Update(new_config)
-			new_config = new_config or {}
-
-			local new_value
-			for i,v in pairs(new_config) do
-				config[i] = v
-				if string.lower(tostring(i)) == 'title' then
-					title = betterFindIndex(config, "Title") or title
-					toggle.TextLabel.Text = title
-					toggle.SearchValue.Value = title
-				elseif string.lower(tostring(i)) == 'value' then
-					new_value = v
-				elseif string.lower(tostring(i)) == 'disabled' then
-					if v then
-						Disabled()
-					else
-						Enabled()
-					end
-				end
-			end
-
-			if new_value ~= nil then
-				if new_value then
-					toggle.Frame.Button.UIGradient.Enabled = true
-					toggle.Frame.Button.BackgroundColor3 = Color3.new(1, 1, 1)
-					Tween(toggle.Frame.Button, { Position = UDim2.new(1, 0, 0.5, 0), AnchorPoint = Vector2.new(1, 0.5) }, 0.3)
-
-					if betterFindIndex(config, "CallBack") then
-						betterFindIndex(config, "CallBack")(true)
-					end
-				else
-					toggle.Frame.Button.UIGradient.Enabled = false
-					toggle.Frame.Button.BackgroundColor3 = library.Settings.theme.LightContrast
-					Tween(toggle.Frame.Button, { Position = UDim2.new(0, 0, 0.5, 0), AnchorPoint = Vector2.new(0, 0.5) }, 0.3)
-
-					if betterFindIndex(config, "CallBack") then
-						betterFindIndex(config, "CallBack")(false)
-					end
-				end
-				task.wait(0.2)
-			end
-		end
-
-		if disabled then
-			Disabled()
-		end
-
-		local active = betterFindIndex(config, "Value") or false
-		if active then
-			Update({ value = active })
-		end
-
-		local debounce
-		toggle.MouseButton1Click:Connect(function()
-			if debounce or disabled then return end
-
-			debounce = true
-
-			active = not active
-			Update({ value = active })
-
-			debounce = false
-		end)
-
-		return { Disabled = Disabled, Enabled = Enabled, Update = Update, Instance = toggle }
 	end
 end
 
