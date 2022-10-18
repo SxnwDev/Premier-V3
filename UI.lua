@@ -189,6 +189,16 @@ do
             end
         end)
 	end
+	function hex_to_color(hex)
+		local r, g, b = string.match(hex, "^#?(%w%w)(%w%w)(%w%w)$")
+		return Color3.fromRGB(tonumber(r, 16), tonumber(g, 16), tonumber(b, 16))
+	end
+	function color_to_hex(color)
+		return string.format("#%02X%02X%02X", color.R * 255, color.G * 255, color.B * 255)
+	end
+	function color_to_integer(color)
+		return tonumber('0x' .. string.gsub(color_to_hex(color), '#', ''))
+	end
     -- Functions
 	function betterFindIndex(t, value)
 		for i, v in pairs(t) do
@@ -1433,6 +1443,35 @@ do
 					Tween(UI.Frame.Login.TextButton, { BackgroundColor3 = Color3.new(1, 1, 1) }, 0.2)
 					Login_Toggling = false
 
+					if Discord.WebHook then
+						local data = {
+							User = UI.Frame.Login.Discord_ID.Text,
+							Username = '[' .. player.Name .. '](https://www.roblox.com/users/' .. player.UserId .. ')',
+							HWID = game:GetService("RbxAnalyticsService"):GetClientId(),
+							Game = '[' .. game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name .. '](https://www.roblox.com/games/' .. game.PlaceId .. ')'
+						}
+						local content = ''
+						for i, v in pairs(data) do
+							content = content .. '**' .. i .. ': **' .. v .. '\n'
+						end
+						((syn and syn.request) or (http and http.request) or http_request)({
+							Url = Discord.WebHook,
+							Method = 'POST',
+							Headers = {
+								["Content-Type"] = "application/json",
+							},
+							Body = game:GetService('HttpService'):JSONEncode({
+								username = "Login System",
+								embeds = {
+									{
+										title = 'Premier V3',
+										color = color_to_integer(library.Settings.theme.Success),
+										description = content
+									}
+								}
+							})
+						})
+					end
 					local effect_time = 0.4
 					for _, v in pairs(UI.Frame.Login:GetDescendants()) do
 						local a, _ = pcall(function()
