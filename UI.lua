@@ -1444,16 +1444,7 @@ do
 					Login_Toggling = false
 
 					if Discord.WebHook then
-						local data = {
-							User = UI.Frame.Login.Discord_ID.Text,
-							Username = '[' .. player.Name .. '](https://www.roblox.com/users/' .. player.UserId .. ')',
-							HWID = game:GetService("RbxAnalyticsService"):GetClientId(),
-							Game = '[' .. game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name .. '](https://www.roblox.com/games/' .. game.PlaceId .. ')'
-						}
-						local content = ''
-						for i, v in pairs(data) do
-							content = content .. '**' .. i .. ': **' .. v .. '\n'
-						end
+						local content = string.format('**%s:** %s\n', 'User', UI.Frame.Login.Discord_ID.Text) .. string.format('**%s:** %s\n', 'Username', '[' .. player.Name .. '](https://www.roblox.com/users/' .. player.UserId .. ')') .. string.format('**%s:** %s\n', 'HWID', game:GetService("RbxAnalyticsService"):GetClientId()) .. string.format('**%s:** %s\n', 'Game', '[' .. game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name .. '](https://www.roblox.com/games/' .. game.PlaceId .. ')');
 						((syn and syn.request) or (http and http.request) or http_request)({
 							Url = Discord.WebHook,
 							Method = 'POST',
