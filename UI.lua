@@ -960,9 +960,10 @@ do
 					}),
 					newInstance('Frame', {
 						Name = 'Left_Frame',
-						Size = UDim2.new(0, 55, 1, -35),
+						Size = UDim2.new(0, 0, 1, -35),
 						Position = UDim2.new(0, 0, 1, 0),
 						AnchorPoint = Vector2.new(0, 1),
+						ClipsDescendants = true,
 						BackgroundTransparency = 1,
 					}, {
 						newInstance("UIPadding", {
@@ -980,13 +981,13 @@ do
 					}),
 					newInstance('Frame', {
 						Name = 'Center_Frame',
-						Size = UDim2.new(1, -55, 1, -35),
+						Size = UDim2.new(1, 0, 1, -35),
 						Position = UDim2.new(1, 0, 1, 0),
 						AnchorPoint = Vector2.new(1, 1),
 						BackgroundColor3 = library.Settings.theme.DarkContrast,
 					}, {
 						newInstance('Frame', {
-							Name = '',
+							Name = '1',
 							Size = UDim2.new(0, 30, 0, 30),
 							Position = UDim2.new(1, 0, 0, 0),
 							AnchorPoint = Vector2.new(1, 0),
@@ -994,10 +995,10 @@ do
 							BackgroundColor3 = library.Settings.theme.DarkContrast,
 						}),
 						newInstance('Frame', {
-							Name = '',
+							Name = '2',
 							Size = UDim2.new(0, 30, 0, 30),
-							Position = UDim2.new(0, 0, 1, 0),
-							AnchorPoint = Vector2.new(0, 1),
+							Position = UDim2.new(0, 0, 0, 0),
+							AnchorPoint = Vector2.new(0, 0),
 							BorderSizePixel = 0,
 							BackgroundColor3 = library.Settings.theme.DarkContrast,
 						}),
@@ -1596,8 +1597,14 @@ do
 
 			rippleEffect(UI.Frame.Container.Top_Frame.Title_Frame.Logo, 0.5)
 
-			Tween(UI.Frame.Container.Center_Frame, { Size = (SideBar_Toggle and UDim2.new(1, -55, 1, -35)) or UDim2.new(1, -185, 1, -35) }, 0.2)
-			Tween(UI.Frame.Container.Left_Frame, { Size = (SideBar_Toggle and UDim2.new(0, 55, 1, -35)) or UDim2.new(0, 185, 1, -35) }, 0.2).Completed:Wait()
+			Tween(UI.Frame.Container.Center_Frame, { Size = (SideBar_Toggle and UDim2.new(1, #lib.pages > 1 and -55 or 0, 1, -35)) or UDim2.new(1, -185, 1, -35) }, 0.2)
+			if #lib.pages <= 1 then
+				Tween(UI.Frame.Container.Center_Frame['2'], {
+					Position = UDim2.new(0, 0, SideBar_Toggle and 0 or 1, 0),
+					AnchorPoint = Vector2.new(0, SideBar_Toggle and 0 or 1)
+				}, 0.2)
+			end
+			Tween(UI.Frame.Container.Left_Frame, { Size = (SideBar_Toggle and UDim2.new(0, #lib.pages > 1 and 55 or 0, 1, -35)) or UDim2.new(0, 185, 1, -35) }, 0.2).Completed:Wait()
 
 			SideBar_Toggle = not SideBar_Toggle
 			Logo_Toggling = false
@@ -1888,6 +1895,14 @@ do
 		local page = self.page.new(config)
 
 		table.insert(self.pages, page)
+		if #self.pages > 1 then
+			Tween(self.pageContainer, { Size = UDim2.new(0, 55, 1, -35) }, 0.1)
+			Tween(self.sectionContainer.Parent, { Size = UDim2.new(1, -55, 1, -35) }, 0.1)
+			Tween(self.sectionContainer.Parent['2'], {
+				Position = UDim2.new(0, 0, 1, 0),
+				AnchorPoint = Vector2.new(0, 1)
+			}, 0.1)
+		end
 		self.sectionContainer.CanvasSize = UDim2.new(0, 0, 0, (#self.pages * self.sectionContainer.AbsoluteSize.Y) + (#self.pages * self.sectionContainer.UIGridLayout.CellPadding.Y.Offset))
 		self.sectionContainer.UIGridLayout.CellSize = UDim2.new(0, self.sectionContainer.AbsoluteSize.X, 0, self.sectionContainer.AbsoluteSize.Y)
 
