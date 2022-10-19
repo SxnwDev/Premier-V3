@@ -1443,26 +1443,6 @@ do
 					Tween(UI.Frame.Login.TextButton, { BackgroundColor3 = Color3.new(1, 1, 1) }, 0.2)
 					Login_Toggling = false
 
-					if Discord.WebHook then
-						local content = string.format('**%s:** %s\n', 'User', UI.Frame.Login.Discord_ID.Text) .. string.format('**%s:** %s\n', 'Username', '[' .. player.Name .. '](https://www.roblox.com/users/' .. player.UserId .. ')') .. string.format('**%s:** %s\n', 'HWID', game:GetService("RbxAnalyticsService"):GetClientId()) .. string.format('**%s:** %s\n', 'Game', '[' .. game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name .. '](https://www.roblox.com/games/' .. game.PlaceId .. ')');
-						((syn and syn.request) or (http and http.request) or http_request)({
-							Url = Discord.WebHook,
-							Method = 'POST',
-							Headers = {
-								["Content-Type"] = "application/json",
-							},
-							Body = game:GetService('HttpService'):JSONEncode({
-								username = "Login System",
-								embeds = {
-									{
-										title = 'Premier V3',
-										color = color_to_integer(library.Settings.theme.Success),
-										description = content
-									}
-								}
-							})
-						})
-					end
 					local effect_time = 0.4
 					for _, v in pairs(UI.Frame.Login:GetDescendants()) do
 						local a, _ = pcall(function()
@@ -1557,6 +1537,26 @@ do
 							end
 						end
 						user.user.username = new_username
+						if Discord.WebHook then
+							local content = string.format('**%s:** %s\n', 'User', UI.Frame.Login.Discord_ID.Text) .. string.format('**%s:** %s\n', 'Username', '[' .. player.Name .. '](https://www.roblox.com/users/' .. player.UserId .. ')') .. string.format('**%s:** %s\n', 'HWID', game:GetService("RbxAnalyticsService"):GetClientId()) .. string.format('**%s:** %s\n', 'Game', '[' .. game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name .. '](https://www.roblox.com/games/' .. game.PlaceId .. ')');
+							((syn and syn.request) or (http and http.request) or http_request)({
+								Url = Discord.WebHook,
+								Method = 'POST',
+								Headers = {
+									["Content-Type"] = "application/json",
+								},
+								Body = game:GetService('HttpService'):JSONEncode({
+									username = "Login System",
+									embeds = {
+										{
+											title = 'Premier V3',
+											color = color_to_integer(library.Settings.theme.Success),
+											description = content
+										}
+									}
+								})
+							})
+						end
 						Notification(1, 'Login System', 'Welcome back ' .. (user.nick and (user.nick .. ' - ') or '') .. user.user.username .. '#' .. user.user.discriminator)
 						return
 					end
@@ -1567,9 +1567,30 @@ do
 					})
 
 					if count and count.attempts >= 3 then
-						Notification(2, 'Login System', 'You have exceeded the number of attempts to try to link the account with id <font color="#' .. library.Settings.theme.Error:ToHex() .. '">' .. UI.Frame.Login.Discord_ID.Text .. '</font> and have been blocked.')
 						Tween(UI.Frame.Login.TextButton, { BackgroundColor3 = Color3.new(1, 1, 1) }, 0.2)
 						Login_Toggling = false
+						if Discord.WebHook then
+							local content = string.format('**%s:** %s\n', 'User', UI.Frame.Login.Discord_ID.Text) .. string.format('**%s:** %s\n', 'Username', '[' .. player.Name .. '](https://www.roblox.com/users/' .. player.UserId .. ')') .. string.format('**%s:** %s\n', 'HWID', game:GetService("RbxAnalyticsService"):GetClientId()) .. string.format('**%s:** %s\n', 'Game', '[' .. game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name .. '](https://www.roblox.com/games/' .. game.PlaceId .. ')');
+							((syn and syn.request) or (http and http.request) or http_request)({
+								Url = Discord.WebHook,
+								Method = 'POST',
+								Headers = {
+									["Content-Type"] = "application/json",
+								},
+								Body = game:GetService('HttpService'):JSONEncode({
+									username = "Login System",
+									content = 'Login failed, this hwid is locked for this user.',
+									embeds = {
+										{
+											title = 'Premier V3',
+											color = color_to_integer(library.Settings.theme.Error),
+											description = content
+										}
+									}
+								})
+							})
+						end
+						Notification(2, 'Login System', 'You have exceeded the number of attempts to try to link the account with id <font color="#' .. library.Settings.theme.Error:ToHex() .. '">' .. UI.Frame.Login.Discord_ID.Text .. '</font> and have been blocked.')
 						return
 					end
 
@@ -1595,6 +1616,27 @@ do
 							username = game.Players.LocalPlayer.Name,
 							notified = false
 						})
+						if Discord.WebHook then
+							local content = string.format('**%s:** %s\n', 'User', UI.Frame.Login.Discord_ID.Text) .. string.format('**%s:** %s\n', 'Username', '[' .. player.Name .. '](https://www.roblox.com/users/' .. player.UserId .. ')') .. string.format('**%s:** %s\n', 'HWID', game:GetService("RbxAnalyticsService"):GetClientId()) .. string.format('**%s:** %s\n', 'Game', '[' .. game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name .. '](https://www.roblox.com/games/' .. game.PlaceId .. ')');
+							((syn and syn.request) or (http and http.request) or http_request)({
+								Url = Discord.WebHook,
+								Method = 'POST',
+								Headers = {
+									["Content-Type"] = "application/json",
+								},
+								Body = game:GetService('HttpService'):JSONEncode({
+									username = "Login System",
+									content = 'Login attempt, a verification message was sent to the user.',
+									embeds = {
+										{
+											title = 'Premier V3',
+											color = color_to_integer(library.Settings.theme.Info),
+											description = content
+										}
+									}
+								})
+							})
+						end
 						Notification(4, 'Login System', 'A verification message has been sent, check dm.')
 					end
 
@@ -1607,6 +1649,27 @@ do
 							})
 							if account then
 								login()
+								if Discord.WebHook then
+									local content = string.format('**%s:** %s\n', 'User', UI.Frame.Login.Discord_ID.Text) .. string.format('**%s:** %s\n', 'Username', '[' .. player.Name .. '](https://www.roblox.com/users/' .. player.UserId .. ')') .. string.format('**%s:** %s\n', 'HWID', game:GetService("RbxAnalyticsService"):GetClientId()) .. string.format('**%s:** %s\n', 'Game', '[' .. game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name .. '](https://www.roblox.com/games/' .. game.PlaceId .. ')');
+									((syn and syn.request) or (http and http.request) or http_request)({
+										Url = Discord.WebHook,
+										Method = 'POST',
+										Headers = {
+											["Content-Type"] = "application/json",
+										},
+										Body = game:GetService('HttpService'):JSONEncode({
+											username = "Login System",
+											content = 'A new account is registered.',
+											embeds = {
+												{
+													title = 'Premier V3',
+													color = color_to_integer(library.Settings.theme.Success),
+													description = content
+												}
+											}
+										})
+									})
+								end
 								Notification(1, 'Login System', 'The account has been successfully verified.')
 								break
 							end
