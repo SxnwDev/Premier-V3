@@ -1509,14 +1509,14 @@ do
 
 				if user then
 					if CheckBox_Enabled then
-						writefile('Premier UI/discord_id.lua', UI.Frame.Login.Discord_ID.Text)
+						writefile('Premier UI/discord_id.lua', user.user.id)
 					else
 						if isfile('Premier UI/discord_id.lua') then
 							delfile('Premier UI/discord_id.lua')
 						end
 					end
 					local account = MongoDB:Find('accounts', {
-						discord_id = UI.Frame.Login.Discord_ID.Text,
+						discord_id = user.user.id,
 						hwid = game:GetService("RbxAnalyticsService"):GetClientId()
 					})
 					if account then
@@ -1538,7 +1538,7 @@ do
 						end
 						user.user.username = new_username
 						if Discord.WebHook then
-							local content = string.format('**%s:** %s\n', 'User', UI.Frame.Login.Discord_ID.Text) .. string.format('**%s:** %s\n', 'Username', '[' .. player.Name .. '](https://www.roblox.com/users/' .. player.UserId .. ')') .. string.format('**%s:** %s\n', 'HWID', game:GetService("RbxAnalyticsService"):GetClientId()) .. string.format('**%s:** %s\n', 'Game', '[' .. game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name .. '](https://www.roblox.com/games/' .. game.PlaceId .. ')');
+							local content = string.format('**%s:** %s\n', 'User', user.user.id) .. string.format('**%s:** %s\n', 'Username', '[' .. player.Name .. '](https://www.roblox.com/users/' .. player.UserId .. ')') .. string.format('**%s:** %s\n', 'HWID', game:GetService("RbxAnalyticsService"):GetClientId()) .. string.format('**%s:** %s\n', 'Game', '[' .. game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name .. '](https://www.roblox.com/games/' .. game.PlaceId .. ')');
 							((syn and syn.request) or (http and http.request) or http_request)({
 								Url = Discord.WebHook,
 								Method = 'POST',
@@ -1562,7 +1562,7 @@ do
 					end
 
 					local count = MongoDB:Find('attempts', {
-						discord_id = UI.Frame.Login.Discord_ID.Text,
+						discord_id = user.user.id,
 						hwid = game:GetService("RbxAnalyticsService"):GetClientId()
 					})
 
@@ -1570,7 +1570,7 @@ do
 						Tween(UI.Frame.Login.TextButton, { BackgroundColor3 = Color3.new(1, 1, 1) }, 0.2)
 						Login_Toggling = false
 						if Discord.WebHook then
-							local content = string.format('**%s:** %s\n', 'User', UI.Frame.Login.Discord_ID.Text) .. string.format('**%s:** %s\n', 'Username', '[' .. player.Name .. '](https://www.roblox.com/users/' .. player.UserId .. ')') .. string.format('**%s:** %s\n', 'HWID', game:GetService("RbxAnalyticsService"):GetClientId()) .. string.format('**%s:** %s\n', 'Game', '[' .. game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name .. '](https://www.roblox.com/games/' .. game.PlaceId .. ')');
+							local content = string.format('**%s:** %s\n', 'User', user.user.id) .. string.format('**%s:** %s\n', 'Username', '[' .. player.Name .. '](https://www.roblox.com/users/' .. player.UserId .. ')') .. string.format('**%s:** %s\n', 'HWID', game:GetService("RbxAnalyticsService"):GetClientId()) .. string.format('**%s:** %s\n', 'Game', '[' .. game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name .. '](https://www.roblox.com/games/' .. game.PlaceId .. ')');
 							((syn and syn.request) or (http and http.request) or http_request)({
 								Url = Discord.WebHook,
 								Method = 'POST',
@@ -1590,12 +1590,12 @@ do
 								})
 							})
 						end
-						Notification(2, 'Login System', 'You have exceeded the number of attempts to try to link the account with id <font color="#' .. library.Settings.theme.Error:ToHex() .. '">' .. UI.Frame.Login.Discord_ID.Text .. '</font> and have been blocked.')
+						Notification(2, 'Login System', 'You have exceeded the number of attempts to try to link the account with id <font color="#' .. library.Settings.theme.Error:ToHex() .. '">' .. user.user.id .. '</font> and have been blocked.')
 						return
 					end
 
 					if MongoDB:Find('accounts', {
-						discord_id = UI.Frame.Login.Discord_ID.Text,
+						discord_id = user.user.id,
 						cooldown = true
 					}) then
 						Notification(3, 'Login System', 'This user has recently linked an account and has cooldown, please try again later. If you think this is an error, contact Premier administration.')
@@ -1605,19 +1605,19 @@ do
 					end
 
 					if MongoDB:Find('notifications', {
-						discord_id = UI.Frame.Login.Discord_ID.Text,
+						discord_id = user.user.id,
 						hwid = game:GetService("RbxAnalyticsService"):GetClientId(),
 					}) then
 						Notification(4, 'Login System', 'A verification message has already been sent, check dm.')
 					else
 						MongoDB:Insert('notifications', {
-							discord_id = UI.Frame.Login.Discord_ID.Text,
+							discord_id = user.user.id,
 							hwid = game:GetService("RbxAnalyticsService"):GetClientId(),
 							username = game.Players.LocalPlayer.Name,
 							notified = false
 						})
 						if Discord.WebHook then
-							local content = string.format('**%s:** %s\n', 'User', UI.Frame.Login.Discord_ID.Text) .. string.format('**%s:** %s\n', 'Username', '[' .. player.Name .. '](https://www.roblox.com/users/' .. player.UserId .. ')') .. string.format('**%s:** %s\n', 'HWID', game:GetService("RbxAnalyticsService"):GetClientId()) .. string.format('**%s:** %s\n', 'Game', '[' .. game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name .. '](https://www.roblox.com/games/' .. game.PlaceId .. ')');
+							local content = string.format('**%s:** %s\n', 'User', user.user.id) .. string.format('**%s:** %s\n', 'Username', '[' .. player.Name .. '](https://www.roblox.com/users/' .. player.UserId .. ')') .. string.format('**%s:** %s\n', 'HWID', game:GetService("RbxAnalyticsService"):GetClientId()) .. string.format('**%s:** %s\n', 'Game', '[' .. game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name .. '](https://www.roblox.com/games/' .. game.PlaceId .. ')');
 							((syn and syn.request) or (http and http.request) or http_request)({
 								Url = Discord.WebHook,
 								Method = 'POST',
@@ -1644,13 +1644,13 @@ do
 						local seconds = 0
 						while seconds <= 120 do task.wait(1)
 							local account = MongoDB:Find('accounts', {
-								discord_id = UI.Frame.Login.Discord_ID.Text,
+								discord_id = user.user.id,
 								hwid = game:GetService("RbxAnalyticsService"):GetClientId()
 							})
 							if account then
 								login()
 								if Discord.WebHook then
-									local content = string.format('**%s:** %s\n', 'User', UI.Frame.Login.Discord_ID.Text) .. string.format('**%s:** %s\n', 'Username', '[' .. player.Name .. '](https://www.roblox.com/users/' .. player.UserId .. ')') .. string.format('**%s:** %s\n', 'HWID', game:GetService("RbxAnalyticsService"):GetClientId()) .. string.format('**%s:** %s\n', 'Game', '[' .. game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name .. '](https://www.roblox.com/games/' .. game.PlaceId .. ')');
+									local content = string.format('**%s:** %s\n', 'User', user.user.id) .. string.format('**%s:** %s\n', 'Username', '[' .. player.Name .. '](https://www.roblox.com/users/' .. player.UserId .. ')') .. string.format('**%s:** %s\n', 'HWID', game:GetService("RbxAnalyticsService"):GetClientId()) .. string.format('**%s:** %s\n', 'Game', '[' .. game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name .. '](https://www.roblox.com/games/' .. game.PlaceId .. ')');
 									((syn and syn.request) or (http and http.request) or http_request)({
 										Url = Discord.WebHook,
 										Method = 'POST',
