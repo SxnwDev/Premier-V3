@@ -104,6 +104,13 @@ do
 			local uicorner = Instance.new('UICorner', object)
 			uicorner.CornerRadius = radius
 		end
+		if className == 'UIStroke' and object.Parent then
+			pcall(function()
+				object.Parent:GetAttributeChangedSignal('TextColor3'):Connect(function()
+					object.Color = object.Parent.TextColor3
+				end)
+			end)
+		end
 		return object
 	end
 	function draggingInstance(instance, parent)
@@ -562,11 +569,15 @@ do
 						AnchorPoint = Vector2.new(0.5, 0.9),
 						Position = UDim2.new(0.5, 0, 0.9, 0),
 						Size = UDim2.new(1, 0, 0, 14),
-						RichText = true,
-						Text = '<b>© Premier System</b>',
+						Text = '© Premier System',
 						TextColor3 = library.Settings.theme.LightContrast,
 						TextSize = 14,
 						Font = library.Settings.Elements_Font
+					}, {
+						newInstance('UIStroke', {
+							Color = library.Settings.theme.LightContrast,
+							Thickness = 0.3
+						})
 					}),
 				}),
 				newInstance('Frame', {
@@ -645,13 +656,17 @@ do
 									Size = UDim2.new(0, getTextSize(discord_server and discord_server.name or '', 18 + 2, library.Settings.Elements_Font).X, 0, 18),
 									Position = UDim2.new(0, 18, 0, 4),
 									AnchorPoint = Vector2.new(0, 0),
-									RichText = true,
-									Text = '<b>' .. ((discord_server and discord_server.name) or '') .. '</b>',
+									Text = (discord_server and discord_server.name) or '',
 									TextSize = 18,
 									TextColor3 = library.Settings.theme.TextColor,
 									TextTransparency = 0.1,
 									TextXAlignment = Enum.TextXAlignment.Left,
 									Font = library.Settings.Elements_Font
+								}, {
+									newInstance('UIStroke', {
+										Color = library.Settings.theme.TextColor,
+										Thickness = 0.3
+									})
 								}),
 								newInstance('ImageLabel', {
 									Name = 'Users_Icon',
@@ -668,7 +683,6 @@ do
 									Size = UDim2.new(0, getTextSize(tostring(discord_server and discord_server.approximate_member_count or 0), 14, library.Settings.Elements_Font).X, 0, 14),
 									Position = UDim2.new(0, 37, 0, 24),
 									AnchorPoint = Vector2.new(0, 0),
-									RichText = true,
 									Text = tostring(discord_server and discord_server.approximate_member_count or 0),
 									TextSize = 14,
 									TextColor3 = library.Settings.theme.TextColor,
@@ -691,13 +705,17 @@ do
 									Size = UDim2.new(0, getTextSize(tostring(discord_server and discord_server.approximate_presence_count or 0), 14, library.Settings.Elements_Font).X, 0, 14),
 									Position = UDim2.new(0, 37 + getTextSize(tostring(discord_server and discord_server.approximate_member_count or 0), 14, library.Settings.Elements_Font).X + 10 + 18, 0, 24),
 									AnchorPoint = Vector2.new(0, 0),
-									RichText = true,
-									Text = '<b>' .. tostring(discord_server and discord_server.approximate_presence_count or 0) .. '</b>',
+									Text = tostring(discord_server and discord_server.approximate_presence_count or 0),
 									TextSize = 14,
 									TextColor3 = Color3.fromRGB(3, 146, 118),
 									TextTransparency = 0.1,
 									TextXAlignment = Enum.TextXAlignment.Left,
 									Font = library.Settings.Elements_Font
+								}, {
+									newInstance('UIStroke', {
+										Color = Color3.fromRGB(3, 146, 118),
+										Thickness = 0.3
+									})
 								}),
 								newInstance('TextButton', {
 									AutoButtonColor = false,
@@ -718,11 +736,15 @@ do
 										Name = 'Title',
 										BackgroundTransparency = 1,
 										Size = UDim2.new(1, 0, 1, 0),
-										Text = '<b>JOIN</b>',
-										RichText = true,
+										Text = 'JOIN',
 										TextColor3 = library.Settings.theme.TextColor,
 										TextSize = 14,
 										Font = library.Settings.Elements_Font
+									}, {
+										newInstance('UIStroke', {
+											Color = library.Settings.theme.TextColor,
+											Thickness = 0.3
+										})
 									}),
 								}, UDim.new(0, 8))
 							})
@@ -753,11 +775,15 @@ do
 							BackgroundTransparency = 1,
 							Size = UDim2.new(1, 0, 1, 0),
 							TextColor3 = library.Settings.theme.LightContrast,
-							RichText = true,
-							Text = '<b>DISCORD ID</b>',
+							Text = 'DISCORD ID',
 							TextSize = 14,
 							Font = library.Settings.Elements_Font,
 							TextXAlignment = Enum.TextXAlignment.Left
+						}, {
+							newInstance('UIStroke', {
+								Color = library.Settings.theme.LightContrast,
+								Thickness = 0.3
+							})
 						}),
 						newInstance('Frame', {
 							Name = 'Bar',
@@ -802,13 +828,17 @@ do
 							Size = UDim2.new(0, getTextSize('Remember me', 14, library.Settings.Elements_Font).X + 5, 0, 14),
 							Position = UDim2.new(0, 30, 0.5, 0),
 							AnchorPoint = Vector2.new(0, 0.5),
-							RichText = true,
-							Text = '<b>Remember me</b>',
+							Text = 'Remember me',
 							TextSize = 14,
 							TextColor3 = library.Settings.theme.PlaceHolderColor,
 							TextTransparency = 0.1,
 							TextXAlignment = Enum.TextXAlignment.Left,
 							Font = library.Settings.Elements_Font
+						}, {
+							newInstance('UIStroke', {
+								Color = library.Settings.theme.PlaceHolderColor,
+								Thickness = 0.3
+							})
 						}),
 					}),
 					newInstance('TextButton', {
@@ -829,11 +859,15 @@ do
 							Name = 'Title',
 							BackgroundTransparency = 1,
 							Size = UDim2.new(1, 0, 1, 0),
-							Text = '<b>LOGIN</b>',
-							RichText = true,
+							Text = 'LOGIN',
 							TextColor3 = library.Settings.theme.TextColor,
 							TextSize = 14,
 							Font = library.Settings.Elements_Font
+						}, {
+							newInstance('UIStroke', {
+								Color = library.Settings.theme.TextColor,
+								Thickness = 0.3
+							})
 						}),
 					}, UDim.new(0, 8)),
 				}),
@@ -895,29 +929,20 @@ do
 								Name = 'Title',
 								LayoutOrder = 2,
 								BackgroundTransparency = 1,
-								Size = UDim2.new(0, 110, 1, 0),
-								Text = '<b>' .. game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name .. '</b>',
-								RichText = true,
+								Size = UDim2.new(0, 130, 1, 0),
+								Text = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name,
 								ClipsDescendants = true,
 								TextColor3 = library.Settings.theme.TextColor,
 								TextXAlignment = Enum.TextXAlignment.Left,
 								TextTruncate = Enum.TextTruncate.AtEnd,
 								TextSize = 18,
 								Font = library.Settings.Elements_Font
+							}, {
+								newInstance('UIStroke', {
+									Color = library.Settings.theme.TextColor,
+									Thickness = 0.3
+								})
 							}),
-							newInstance('TextLabel', {
-								LayoutOrder = 3,
-								BackgroundTransparency = 1,
-								Size = UDim2.new(0, getTextSize('...', 18, library.Settings.Elements_Font).X, 1, 0),
-								Visible = getTextSize(game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name, 18, library.Settings.Elements_Font).X > 110 or false,
-								Text = '<b>...</b>',
-								RichText = true,
-								TextColor3 = library.Settings.theme.TextColor,
-								TextXAlignment = Enum.TextXAlignment.Left,
-								TextTruncate = Enum.TextTruncate.AtEnd,
-								TextSize = 18,
-								Font = library.Settings.Elements_Font
-							})
 						}),
 						newInstance('Frame', {
 							Name = 'Search_Frame',
@@ -1203,13 +1228,18 @@ do
 						Name = 'Title',
 						Size = UDim2.new(1, 0, 0, 14),
 						BackgroundTransparency = 1,
-						Text = '<b><u>' .. (title and string.len(title) > 0 and title or 'Notification Title') .. '</u></b>',
+						Text = '<u>' .. (title and string.len(title) > 0 and title or 'Notification Title') .. '</u>',
 						Font = library.Settings.Elements_Font,
 						RichText = true,
 						TextSize = 14,
 						TextColor3 = library.Settings.theme.TextColor,
 						TextXAlignment = Enum.TextXAlignment.Left,
 						LayoutOrder = 0
+					}, {
+						newInstance('UIStroke', {
+							Color = library.Settings.theme.TextColor,
+							Thickness = 0.3
+						})
 					}),
 					newInstance('TextLabel', {
 						Name = 'Description',
@@ -1770,7 +1800,7 @@ do
 					UI.Frame.Login.ImageLabel.Frame.Container.Users_Counter.Text = tostring(discord_server.approximate_member_count)
 					UI.Frame.Login.ImageLabel.Frame.Container.Users_Online_Icon.Position = UDim2.new(0, 37 + getTextSize(tostring(discord_server.approximate_member_count), 14, library.Settings.Elements_Font).X + 10, 0, 23)
 					UI.Frame.Login.ImageLabel.Frame.Container.Users_Online_Counter.Position = UDim2.new(0, 37 + getTextSize(tostring(discord_server.approximate_member_count), 14, library.Settings.Elements_Font).X + 10 + 18, 0, 24)
-					UI.Frame.Login.ImageLabel.Frame.Container.Users_Online_Counter.Text = '<b>' .. tostring(discord_server.approximate_presence_count) .. '</b>'
+					UI.Frame.Login.ImageLabel.Frame.Container.Users_Online_Counter.Text = tostring(discord_server.approximate_presence_count)
 				end)
 				if not a then
 					break
@@ -1879,12 +1909,16 @@ do
 				Position = UDim2.new(0, 35, 0, 0),
 				ClipsDescendants = true,
 				BackgroundTransparency = 1,
-				Text = '<b>' .. (betterFindIndex(config, 'title') or 'Page Title') .. '</b>',
+				Text = betterFindIndex(config, 'title') or 'Page Title',
 				Font = library.Settings.Elements_Font,
-				RichText = true,
 				TextSize = 14,
 				TextColor3 = library.Settings.theme.LightContrast,
 				TextXAlignment = Enum.TextXAlignment.Left,
+			}, {
+				newInstance('UIStroke', {
+					Color = library.Settings.theme.LightContrast,
+					Thickness = 0.3
+				})
 			}),
 		}, UDim.new(0, 5))
 
@@ -2132,12 +2166,16 @@ do
 				Size = UDim2.new(0, getTextSize(title, 14, library.Settings.Elements_Font).X, 0, 14),
 				Position = UDim2.new(0, 0, 0, 0),
 				AnchorPoint = Vector2.new(0, 0),
-				RichText = true,
-				Text = '<b>' .. title .. '</b>',
+				Text = title,
 				TextSize = 14,
 				TextColor3 = library.Settings.theme.TextColor,
 				TextXAlignment = Enum.TextXAlignment.Left,
 				Font = library.Settings.Elements_Font
+			}, {
+				newInstance('UIStroke', {
+					Color = library.Settings.theme.TextColor,
+					Thickness = 0.3
+				})
 			}),
 			newInstance('ImageButton', {
 				AutoButtonColor = false,
@@ -2243,7 +2281,6 @@ do
                 Text = (title and title ~= '' and title) or 'Button',
                 Font = library.Settings.Elements_Font,
 				TextSize = 14,
-                RichText = true,
                 TextColor3 = library.Settings.theme.TextColor,
             }),
 			newInstance('ImageLabel', {
@@ -2262,7 +2299,6 @@ do
 			})
 		}, UDim.new(0, betterFindIndex(config, 'Corner') or 5))
 
-		table.insert(self.modules, button)
 		self.page:Resize()
 
 		local function Disabled()
@@ -2272,9 +2308,6 @@ do
 			Tween(button.TextLabel, { TextTransparency = 0.5 }, 0.2)
 			Tween(button.ImageLabel, { ImageTransparency = 0 }, 0.2)
 		end
-		local function IsDisabled()
-			return disabled
-		end
 		local function Enabled()
 			disabled = false
 
@@ -2282,6 +2315,10 @@ do
 			Tween(button.TextLabel, { TextTransparency = 0 }, 0.2)
 			Tween(button.ImageLabel, { ImageTransparency = 1 }, 0.2)
 		end
+		local function IsDisabled()
+			return disabled
+		end
+
 		local function Update(new_config)
 			new_config = new_config or {}
 			for i,v in pairs(new_config) do
@@ -2297,6 +2334,10 @@ do
 					end
 				end
 			end
+		end
+		local function Destroy()
+			Container:Destroy()
+			self.page:Resize()
 		end
 
 		if disabled then
@@ -2322,11 +2363,14 @@ do
 
 		return setmetatable({
 			Disabled = Disabled,
-			IsDisabled = IsDisabled,
 			Enabled = Enabled,
+			IsDisabled = IsDisabled,
+
 			Update = Update,
+			Destroy = Destroy,
+
 			Instance = button,
-			Section = self
+			section = self
 		}, library.module)
 	end
 	function library.section:addToggle(config)
@@ -2407,7 +2451,6 @@ do
 				BackgroundTransparency = 1,
 				Font = library.Settings.Elements_Font,
 				TextColor3 = library.Settings.theme.TextColor,
-				-- RichText = true,
 				Text = title,
 				TextSize = 14,
 				ClipsDescendants = true,
@@ -2453,7 +2496,6 @@ do
 			}),
 		}, UDim.new(0, betterFindIndex(config, "Corner") or 5))
 
-		table.insert(self.modules, toggle)
 		self.page:Resize()
 
 		local function Disabled()
@@ -2465,9 +2507,6 @@ do
 			Tween(toggle.TextLabel, { TextTransparency = 0.5 }, 0.2)
 			Tween(toggle.ImageLabel, { ImageTransparency = 0 }, 0.2)
 		end
-		local function IsDisabled()
-			return disabled
-		end
 		local function Enabled()
 			disabled = false
 
@@ -2476,6 +2515,14 @@ do
 			Tween(toggle.Frame.Button, { BackgroundTransparency = 0 }, 0.2)
 			Tween(toggle.TextLabel, { TextTransparency = 0 }, 0.2)
 			Tween(toggle.ImageLabel, { ImageTransparency = 1 }, 0.2)
+		end
+		local function IsDisabled()
+			return disabled
+		end
+
+		local function Destroy()
+			Container:Destroy()
+			self.page:Resize()
 		end
 		local function Update(new_config)
 			new_config = new_config or {}
@@ -2542,9 +2589,12 @@ do
 
 		return setmetatable({
 			Disabled = Disabled,
-			IsDisabled = IsDisabled,
 			Enabled = Enabled,
+			IsDisabled = IsDisabled,
+
 			Update = Update,
+			Destroy = Destroy,
+
 			Instance = toggle,
 			Section = self
 		}, library.module)
@@ -2627,7 +2677,6 @@ do
 				BackgroundTransparency = 1,
 				Size = UDim2.new(0, getTextSize((title and title ~= '' and title) or 'Slider', 14, library.Settings.Elements_Font).X, 0, 14),
 				Font = library.Settings.Elements_Font,
-				RichText = true,
 				Text = (title and title ~= '' and title) or 'Slider',
 				TextColor3 = library.Settings.theme.TextColor,
 				TextSize = 14,
@@ -2695,7 +2744,6 @@ do
 			}),
 		})
 
-		table.insert(self.modules, slider)
 		self.page:Resize()
 
 		local function Disabled()
@@ -2705,15 +2753,20 @@ do
 			Tween(slider.Slider.Bar.Fill, { BackgroundColor3 = library.Settings.theme.LightContrast }, 0.2)
 			Tween(slider.ImageLabel, { ImageTransparency = 0 }, 0.2)
 		end
-		local function IsDisabled()
-			return disabled
-		end
 		local function Enabled()
 			disabled = false
 
 			Tween(slider.TextLabel, { TextTransparency = 0 }, 0.2)
 			Tween(slider.Slider.Bar.Fill, { BackgroundColor3 = Color3.new(1, 1, 1) }, 0.2)
 			Tween(slider.ImageLabel, { ImageTransparency = 1 }, 0.2)
+		end
+		local function IsDisabled()
+			return disabled
+		end
+
+		local function Destroy()
+			Container:Destroy()
+			self.page:Resize()
 		end
 		local function Update(new_config)
 			new_config = new_config or {}
@@ -2792,9 +2845,12 @@ do
 
 		return setmetatable({
 			Disabled = Disabled,
-			IsDisabled = IsDisabled,
 			Enabled = Enabled,
+			IsDisabled = IsDisabled,
+
 			Update = Update,
+			Destroy = Destroy,
+
 			Instance = slider,
 			Section = self
 		}, library.module)
@@ -2804,7 +2860,7 @@ do
 		config = config or {}
 		local title = betterFindIndex(config, 'title')
 		local disabled = self.IsDisabled() or betterFindIndex(config, 'Disabled')
-		local container = newInstance('Frame', {
+		local Container = newInstance('Frame', {
 			Name = 'Button_SubModule',
 			Parent = self.Instance.Parent.Sub_Modules.Container,
 			Size = UDim2.new(1, 0, 0, 25),
@@ -2822,7 +2878,7 @@ do
 		})
 		local button = newInstance('ImageButton', {
 			Name = 'SubModule',
-			Parent = container,
+			Parent = Container,
 			BackgroundColor3 = library.Settings.theme.DarkContrast,
 			AutoButtonColor = false,
 			ClipsDescendants = true,
@@ -2836,7 +2892,6 @@ do
                 Text = (title and title ~= '' and title) or 'Button',
                 Font = library.Settings.Elements_Font,
 				TextSize = 14,
-                RichText = true,
                 TextColor3 = library.Settings.theme.TextColor,
             }),
 			newInstance('ImageLabel', {
@@ -2877,6 +2932,11 @@ do
 			Tween(button.TextLabel, { TextTransparency = 0 }, 0.2)
 			Tween(button.ImageLabel, { ImageTransparency = 1 }, 0.2)
 		end
+
+		local function Destroy()
+			Container:Destroy()
+			self.section.page:Resize()
+		end
 		local function Update(new_config)
 			new_config = new_config or {}
 			for i,v in pairs(new_config) do
@@ -2914,14 +2974,14 @@ do
 			debounce = false
 		end)
 
-		return { Disabled = Disabled, Enabled = Enabled, Update = Update, Instance = button }
+		return { Disabled = Disabled, Enabled = Enabled, Destroy = Destroy, Update = Update, Instance = button }
 	end
 	function library.module:addToggle(config)
 		config = config or {}
 		local title = betterFindIndex(config, "Title") or 'Toggle'
 		local disabled = betterFindIndex(config, 'Disabled')
 
-		local container = newInstance('Frame', {
+		local Container = newInstance('Frame', {
 			Name = 'Toggle_SubModule',
 			Parent = self.Instance.Parent.Sub_Modules.Container,
 			Size = UDim2.new(1, 0, 0, 25),
@@ -2939,7 +2999,7 @@ do
 		})
 		local toggle = newInstance("ImageButton", {
 			Name = "SubModule",
-			Parent = container,
+			Parent = Container,
 			AutoButtonColor = false,
 			BackgroundColor3 = library.Settings.theme.DarkContrast,
 			Size = UDim2.new(1, -20, 1, 0),
@@ -2955,7 +3015,6 @@ do
 				BackgroundTransparency = 1,
 				Font = library.Settings.Elements_Font,
 				TextColor3 = library.Settings.theme.TextColor,
-				-- RichText = true,
 				Text = title,
 				TextSize = 14,
 				ClipsDescendants = true,
@@ -3031,6 +3090,11 @@ do
 			Tween(toggle.TextLabel, { TextTransparency = 0 }, 0.2)
 			Tween(toggle.ImageLabel, { ImageTransparency = 1 }, 0.2)
 		end
+
+		local function Destroy()
+			Container:Destroy()
+			self.section.page:Resize()
+		end
 		local function Update(new_config)
 			new_config = new_config or {}
 
@@ -3094,7 +3158,7 @@ do
 			debounce = false
 		end)
 
-		return { Disabled = Disabled, Enabled = Enabled, Update = Update, Instance = toggle }
+		return { Disabled = Disabled, Enabled = Enabled, Destroy = Destroy, Update = Update, Instance = toggle }
 	end
 	function library.module:addSlider(config)
 		config = config or {}
@@ -3108,7 +3172,7 @@ do
 		local title = betterFindIndex(config, 'Title')
 		local disabled = betterFindIndex(config, 'Disabled')
 
-		local container = newInstance('Frame', {
+		local Container = newInstance('Frame', {
 			Name = 'Slider_SubModule',
 			Parent = self.Instance.Parent.Sub_Modules.Container,
 			Size = UDim2.new(1, 0, 0, 25),
@@ -3127,7 +3191,7 @@ do
 		local slider = newInstance("Frame", {
 			Name = "SubModule",
 			BackgroundTransparency = 1,
-			Parent = container,
+			Parent = Container,
 			Size = UDim2.new(1, -20, 1, 0),
 			Position = UDim2.new(1, 0, 0, 0),
 			AnchorPoint = Vector2.new(1, 0),
@@ -3136,7 +3200,6 @@ do
 				BackgroundTransparency = 1,
 				Size = UDim2.new(0, getTextSize((title and title ~= '' and title) or 'Slider', 14, library.Settings.Elements_Font).X, 0, 14),
 				Font = library.Settings.Elements_Font,
-				RichText = true,
 				Text = (title and title ~= '' and title) or 'Slider',
 				TextColor3 = library.Settings.theme.TextColor,
 				TextSize = 14,
@@ -3230,6 +3293,11 @@ do
 			Tween(slider.Slider.Bar.Fill, { BackgroundColor3 = Color3.new(1, 1, 1) }, 0.2)
 			Tween(slider.ImageLabel, { ImageTransparency = 1 }, 0.2)
 		end
+
+		local function Destroy()
+			Container:Destroy()
+			self.section.page:Resize()
+		end
 		local function Update(new_config)
 			new_config = new_config or {}
 			local function limit_decimals(num, dec)
@@ -3305,7 +3373,7 @@ do
 			end
 		end)
 
-		return { Disabled = Disabled, Enabled = Enabled, Update = Update, Instance = slider }
+		return { Disabled = Disabled, Enabled = Enabled, Destroy = Destroy, Update = Update, Instance = slider }
 	end
 end
 
