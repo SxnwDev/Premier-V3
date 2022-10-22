@@ -3378,3 +3378,5 @@ do
 		return { Disabled = Disabled, Enabled = Enabled, Destroy = Destroy, Update = Update, Instance = slider }
 	end
 end
+
+return { Library = library, Discord = Discord, MongoDB = MongoDB }
