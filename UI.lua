@@ -1105,7 +1105,7 @@ do
 				ZIndex = 10
 			}, {
 				newInstance('TextLabel', {
-					Size = UDim2.new(1, 0, 1, 0),
+					Size = UDim2.new(1, -10, 0, 14),
 					Position = UDim2.new(0.5, 0, 0.5, 0),
 					AnchorPoint = Vector2.new(0.5, 0.5),
 					BackgroundTransparency = 1,
@@ -1117,7 +1117,7 @@ do
 					TextColor3 = library.Settings.theme.TextColor,
 					Font = library.Settings.Elements_Font,
 					TextXAlignment = Enum.TextXAlignment.Center,
-					ZIndex = 11
+					ZIndex = 11,
 				}),
 				newInstance('ImageLabel', {
 					Size = UDim2.new(0, 15, 0, 15),
@@ -1133,9 +1133,9 @@ do
 
 			for i = 1, text:len() do
 				tooltip.TextLabel.Text = text:sub(1, i)
-				tooltip.TextLabel.Size = UDim2.new(0, tooltip.TextLabel.TextBounds.X, 0, tooltip.TextLabel.TextBounds.Y)
+				tooltip.TextLabel.Size = UDim2.new(1, -10, 0, tooltip.TextLabel.TextBounds.Y)
 			end
-			tooltip.Size = UDim2.new(0, math.min(350, math.max(40, tooltip.TextLabel.AbsoluteSize.X + 20)), 0, 10 + tooltip.TextLabel.AbsoluteSize.Y)
+			tooltip.Size = UDim2.new(0, math.min(350, math.max(40, tooltip.TextLabel.TextBounds.X + 20)), 0, 10 + tooltip.TextLabel.AbsoluteSize.Y)
 
 			local sec = 0
 			local tooltip_mouse_leave
