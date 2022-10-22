@@ -1109,11 +1109,13 @@ do
 					Position = UDim2.new(0.5, 0, 0.5, 0),
 					AnchorPoint = Vector2.new(0.5, 0.5),
 					BackgroundTransparency = 1,
-					Text = text,
-					Font = library.Settings.Elements_Font,
 					RichText = true,
+					TextWrapped = true,
+					Text = text,
 					TextSize = 14,
+					LineHeight = 0.8,
 					TextColor3 = library.Settings.theme.TextColor,
+					Font = library.Settings.Elements_Font,
 					TextXAlignment = Enum.TextXAlignment.Center,
 					ZIndex = 11
 				}),
@@ -3376,5 +3378,3 @@ do
 		return { Disabled = Disabled, Enabled = Enabled, Destroy = Destroy, Update = Update, Instance = slider }
 	end
 end
-
-return { Library = library, Discord = Discord, MongoDB = MongoDB }
