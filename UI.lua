@@ -418,8 +418,17 @@ do
 				["api-key"] = self.API_TOKEN
 			},
 			Body = game:GetService("HttpService"):JSONEncode(body)
-		}).Body
-		return game:GetService("HttpService"):JSONDecode(Request)
+		})
+		if Request.Body then
+			pcall(function()
+				Request.Body = game:GetService("HttpService"):JSONDecode(Request.Body)
+			end)
+			if typeof(Request.Body) == "table" then
+				return Request.Body
+			end
+		else
+			print(Request)
+		end
 	end
 	function MongoDB:Find(Collection, Filter)
 		local Body = {
@@ -428,10 +437,13 @@ do
 			dataSource = "Cluster0",
 			filter = Filter,
 		}
-		return MongoDB:HTTPPost(
+		local response = MongoDB:HTTPPost(
 			"findOne",
 			Body
-		).document
+		)
+		if response then
+			return response.document
+		end
 	end
 	function MongoDB:Insert(Collection, DocumentData)
 		local Body = {
@@ -440,10 +452,13 @@ do
 			dataSource = "Cluster0",
 			document = DocumentData,
 		}
-		return MongoDB:HTTPPost(
+		local response =  MongoDB:HTTPPost(
 			"insertOne",
 			Body
-		).insertedId
+		)
+		if response then
+			return response.insertedId
+		end
 	end
 	function MongoDB:Update(Collection, Filter, UpdatedDocumentData, Upsert)
 		local Body = {
@@ -1674,7 +1689,7 @@ do
 
 					task.spawn(function()
 						local seconds = 0
-						while seconds <= 120 do task.wait(1)
+						while seconds <= 120 and lib.Enabled do task.wait(1)
 							local account = MongoDB:Find("accounts", {
 								discord_id = user.user.id,
 								hwid = game:GetService("RbxAnalyticsService"):GetClientId()
