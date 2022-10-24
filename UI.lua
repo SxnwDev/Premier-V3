@@ -2,13 +2,13 @@ if not game:IsLoaded() then
 	game.Loaded:Wait()
 end
 -- game variables
-local player = game:GetService('Players').LocalPlayer
+local player = game:GetService("Players").LocalPlayer
 local mouse = player:GetMouse()
-local uis = game:GetService('UserInputService')
-local wrk = game:GetService('Workspace')
+local uis = game:GetService("UserInputService")
+local wrk = game:GetService("Workspace")
 -- Library variables
 local library = {
-	Version = '1',
+	Version = "1",
 	Parent = game.CoreGui,
 	Settings = {
 		NewUser = true,
@@ -64,11 +64,11 @@ do
 		local object = Instance.new(className)
 		for i, v in pairs(properties or {}) do
 			object[i] = v
-			if typeof(v) == 'Color3' then
+			if typeof(v) == "Color3" then
 				for p, k in pairs(library.Settings.theme) do
 					if k == v then
 						library.objects[p] = library.objects[p] or {}
-						library.objects[p][i] = library.objects[p][i] or setmetatable({}, { _mode = 'k' })
+						library.objects[p][i] = library.objects[p][i] or setmetatable({}, { _mode = "k" })
 						table.insert(library.objects[p][i], object)
 						local lastTheme = library.objects[p][i]
 						object:GetPropertyChangedSignal(i):Connect(function()
@@ -81,7 +81,7 @@ do
 							for j, h in pairs(library.Settings.theme) do
 								if h == object[i] then
 									library.objects[j] = library.objects[j] or {}
-									library.objects[j][i] = library.objects[j][i] or setmetatable({}, { _mode = 'k' })
+									library.objects[j][i] = library.objects[j][i] or setmetatable({}, { _mode = "k" })
 									table.insert(library.objects[j][i], object)
 									lastTheme = library.objects[j][i]
 								end
@@ -90,7 +90,7 @@ do
 					end
 				end
 			elseif typeof(v) == "string" then
-				if v:match('rbxassetid://') or v:match('https://www.roblox.com/asset/?id=') then
+				if v:match("rbxassetid://") or v:match("https://www.roblox.com/asset/?id=") then
 					table.insert(AssetToLoad, v)
 				end
 			end
@@ -101,12 +101,12 @@ do
 			end)
 		end
 		if radius then
-			local uicorner = Instance.new('UICorner', object)
+			local uicorner = Instance.new("UICorner", object)
 			uicorner.CornerRadius = radius
 		end
-		if className == 'UIStroke' and object.Parent then
+		if className == "UIStroke" and object.Parent then
 			pcall(function()
-				object.Parent:GetAttributeChangedSignal('TextColor3'):Connect(function()
+				object.Parent:GetAttributeChangedSignal("TextColor3"):Connect(function()
 					object.Color = object.Parent.TextColor3
 				end)
 			end)
@@ -204,7 +204,7 @@ do
 		return string.format("#%02X%02X%02X", color.R * 255, color.G * 255, color.B * 255)
 	end
 	function color_to_integer(color)
-		return tonumber('0x' .. string.gsub(color_to_hex(color), '#', ''))
+		return tonumber("0x" .. string.gsub(color_to_hex(color), "#", ""))
 	end
     -- Functions
 	function betterFindIndex(t, value)
@@ -215,10 +215,10 @@ do
 		end
 	end
 	function getTextSize(Text, TextSize, Font)
-		return game:GetService('TextService'):GetTextSize(Text:gsub('<[^<>]->', ''), TextSize, Font, Vector2.new(math.huge, TextSize))
+		return game:GetService("TextService"):GetTextSize(Text:gsub("<[^<>]->", ""), TextSize, Font, Vector2.new(math.huge, TextSize))
 	end
 	function Tween(instance, properties, duration, ...)
-		local Tween = game:GetService('TweenService'):Create(instance, TweenInfo.new(duration, ...), properties)
+		local Tween = game:GetService("TweenService"):Create(instance, TweenInfo.new(duration, ...), properties)
 		Tween:Play()
 		return Tween
 	end
@@ -268,7 +268,7 @@ do
     -- Effects
 	function rippleEffect(instance, duration, extra)
 		extra =  extra or 0
-		local Ripple = newInstance('Frame', {
+		local Ripple = newInstance("Frame", {
 			Parent = instance,
 			BackgroundColor3 = library.Settings.theme.TextColor,
 			BackgroundTransparency = 0.6,
@@ -287,8 +287,8 @@ do
 	end
 	function writeEffect(TextLabel, delay)
 		local displayText = TextLabel.Text
-		displayText = displayText:gsub('<br%s*/>', '\n')
-		displayText:gsub('<[^<>]->', '')
+		displayText = displayText:gsub("<br%s*/>", "\n")
+		displayText:gsub("<[^<>]->", "")
 		for i, v in utf8.graphemes(displayText) do
 			TextLabel.MaxVisibleGraphemes = i
 			task.wait(delay)
@@ -304,11 +304,11 @@ do
 		for i = 97, 122 do
 			table.insert(alphabet_lower, string.char(i))
 		end
-		TextLabel.Text = ''
+		TextLabel.Text = ""
 		-- TextLabel.TextXAlignment = Enum.TextXAlignment.Left
-		for _, v in pairs(string.split(Text, '')) do task.wait()
+		for _, v in pairs(string.split(Text, "")) do task.wait()
 			local txt = TextLabel.Text
-			if (string.gsub(v, '%a', '')) ~= '' then
+			if (string.gsub(v, "%a", "")) ~= "" then
 				TextLabel.Text = txt .. v
 			else
 				if v == string.lower(v) then
@@ -345,23 +345,23 @@ do
 		local response
 		if guildID and typeof(guildID) == "string" then
 			response =  req({
-				Url = 'https://discord.com/api/v9/guilds/' .. guildID .. '/members/' .. userID,
+				Url = "https://discord.com/api/v9/guilds/" .. guildID .. "/members/" .. userID,
 				Method = "GET",
 				Headers = {
-					["Authorization"] = 'Bot ' .. Discord.Token,
+					["Authorization"] = "Bot " .. Discord.Token,
 				}
 			}).Body
 		else
 			response =  req({
-				Url = 'https://discord.com/api/v9/users/' .. userID,
+				Url = "https://discord.com/api/v9/users/" .. userID,
 				Method = "GET",
 				Headers = {
-					["Authorization"] = 'Bot ' .. Discord.Token,
+					["Authorization"] = "Bot " .. Discord.Token,
 				}
 			}).Body
 		end
 		if typeof(response) ~= "table" then
-			return game:GetService('HttpService'):JSONDecode(response)
+			return game:GetService("HttpService"):JSONDecode(response)
 		end
 		return response
 	end
@@ -370,10 +370,10 @@ do
 		if not req then return end
 		if typeof(guildID) ~= "string" then return end
 		local response =  req({
-			Url = 'https://discord.com/api/v9/guilds/' .. guildID .. '?with_counts=true',
+			Url = "https://discord.com/api/v9/guilds/" .. guildID .. "?with_counts=true",
 			Method = "GET",
 			Headers = {
-				["Authorization"] = 'Bot ' .. Discord.Token,
+				["Authorization"] = "Bot " .. Discord.Token,
 			},
 			Body = {
 				["with_counts?"] = true
@@ -382,7 +382,7 @@ do
 
 		if typeof(response) ~= "table" then
 			pcall(function()
-				response = game:GetService('HttpService'):JSONDecode(response)
+				response = game:GetService("HttpService"):JSONDecode(response)
 			end)
 		end
 		return response
@@ -392,15 +392,15 @@ do
 		if not req then return end
 		if typeof(guildID) ~= "string" then return end
 		local response =  req({
-			Url = 'https://discord.com/api/v9/guilds/' .. guildID .. '/invites',
+			Url = "https://discord.com/api/v9/guilds/" .. guildID .. "/invites",
 			Method = "GET",
 			Headers = {
-				["Authorization"] = 'Bot ' .. Discord.Token,
+				["Authorization"] = "Bot " .. Discord.Token,
 			}
 		}).Body
 
 		if typeof(response) ~= "table" then
-			return game:GetService('HttpService'):JSONDecode(response)
+			return game:GetService("HttpService"):JSONDecode(response)
 		end
 		return response
 	end
@@ -411,51 +411,51 @@ do
 	function MongoDB:HTTPPost(action, body)
 		local req = (syn and syn.request) or (http and http.request) or http_request
 		local Request = req({
-			Url = self.URL_ENDPOINT .. '/action/' .. action,
-			Method = 'POST',
+			Url = self.URL_ENDPOINT .. "/action/" .. action,
+			Method = "POST",
 			Headers = {
 				["Content-Type"] = "application/json",
-				['api-key'] = self.API_TOKEN
+				["api-key"] = self.API_TOKEN
 			},
-			Body = game:GetService('HttpService'):JSONEncode(body)
+			Body = game:GetService("HttpService"):JSONEncode(body)
 		}).Body
-		return game:GetService('HttpService'):JSONDecode(Request)
+		return game:GetService("HttpService"):JSONDecode(Request)
 	end
 	function MongoDB:Find(Collection, Filter)
 		local Body = {
 			collection = Collection,
-			database = 'WhiteList',
-			dataSource = 'Cluster0',
+			database = "WhiteList",
+			dataSource = "Cluster0",
 			filter = Filter,
 		}
 		return MongoDB:HTTPPost(
-			'findOne',
+			"findOne",
 			Body
 		).document
 	end
 	function MongoDB:Insert(Collection, DocumentData)
 		local Body = {
 			collection = Collection or self.StaticCollection,
-			database = 'WhiteList',
-			dataSource = 'Cluster0',
+			database = "WhiteList",
+			dataSource = "Cluster0",
 			document = DocumentData,
 		}
 		return MongoDB:HTTPPost(
-			'insertOne',
+			"insertOne",
 			Body
 		).insertedId
 	end
 	function MongoDB:Update(Collection, Filter, UpdatedDocumentData, Upsert)
 		local Body = {
 			collection = Collection or self.StaticCollection,
-			database = 'WhiteList',
-			dataSource = 'Cluster0',
+			database = "WhiteList",
+			dataSource = "Cluster0",
 			upsert = Upsert or false,
 			filter = Filter,
 			update = UpdatedDocumentData,
 		}
 		return MongoDB:HTTPPost(
-			'updateOne',
+			"updateOne",
 			Body
 		)
 	end
@@ -469,18 +469,18 @@ do
 
 	function library.new()
 		local function check()
-			if not library.Parent:FindFirstChild('Premier System') then
+			if not library.Parent:FindFirstChild("Premier System") then
 				return true
 			end
 		end
 		while not check() and task.wait() do
 			pcall(function()
-				library.Parent:FindFirstChild('Premier System'):Destroy()
+				library.Parent:FindFirstChild("Premier System"):Destroy()
 			end)
 		end
 
-		if not isfolder('Premier UI') then
-			makefolder('Premier UI')
+		if not isfolder("Premier UI") then
+			makefolder("Premier UI")
 		end
 		if not uis.MouseIconEnabled then
 			uis.MouseIconEnabled = true
@@ -488,7 +488,7 @@ do
 
 		table.insert(library.connections, player.Idled:Connect(function()
 			pcall(function()
-				game:GetService('VirtualUser'):ClickButton2(Vector2.new())
+				game:GetService("VirtualUser"):ClickButton2(Vector2.new())
 			end)
 		end))
 
@@ -509,54 +509,54 @@ do
 				end
 			end)
 		end
-		local UI = newInstance('ScreenGui', {
-			Name = 'Premier System',
+		local UI = newInstance("ScreenGui", {
+			Name = "Premier System",
 			Parent = library.Parent
 		}, {
-			newInstance('Frame', {
+			newInstance("Frame", {
 				BackgroundColor3 = library.Settings.theme.Background,
 				AnchorPoint = Vector2.new(0.5, 0.5),
 				Position = UDim2.new(0.5, 0, 0.5, 0),
 				Size = UDim2.new(0, 350, 0, 500),
 				Visible = false
 			}, {
-				newInstance('Frame', {
-					Name = 'Loader',
+				newInstance("Frame", {
+					Name = "Loader",
 					BackgroundTransparency = 1,
 					Size = UDim2.new(1, 0, 1, 0),
 				}, {
-					newInstance('ImageLabel', {
-						Name = 'Icon',
+					newInstance("ImageLabel", {
+						Name = "Icon",
 						BackgroundTransparency = 1,
 						AnchorPoint = Vector2.new(0.5, 0.4),
 						Position = UDim2.new(0.5, 0, 0.4, 0),
 						Size = UDim2.new(0, 150, 0, 150),
-						Image = 'rbxassetid://7733678388',
+						Image = "rbxassetid://7733678388",
 						ImageColor3 = Color3.new(1, 1, 1),
 						ScaleType = Enum.ScaleType.Crop
 					}, {
-						newInstance('UIGradient', {
+						newInstance("UIGradient", {
 							Color = ColorSequence.new{
 								ColorSequenceKeypoint.new(0, Color3.fromRGB(254, 116, 13)),
 								ColorSequenceKeypoint.new(1, Color3.fromRGB(234, 12, 50))
 							}
 						})
 					}),
-					newInstance('Frame', {
-						Name = 'Bar',
+					newInstance("Frame", {
+						Name = "Bar",
 						AnchorPoint = Vector2.new(0.5, 0.63),
 						Position = UDim2.new(0.5, 0, 0.63, 0),
 						Size = UDim2.new(0, 200, 0, 4),
 						BackgroundColor3 = library.Settings.theme.LightContrast,
 						BorderSizePixel = 0,
 					}, {
-						newInstance('Frame', {
-							Name = 'Fill',
+						newInstance("Frame", {
+							Name = "Fill",
 							Size = UDim2.new(0, 0, 1, 0),
 							BorderSizePixel = 0,
 							BackgroundColor3 = Color3.new(1, 1, 1),
 						}, {
-							newInstance('UIGradient', {
+							newInstance("UIGradient", {
 								Color = ColorSequence.new{
 									ColorSequenceKeypoint.new(0, Color3.fromRGB(40, 53, 221)),
 									ColorSequenceKeypoint.new(1, Color3.fromRGB(3, 156, 251))
@@ -564,121 +564,121 @@ do
 							})
 						}, UDim.new(1, 0))
 					}, UDim.new(1, 0)),
-					newInstance('TextLabel', {
+					newInstance("TextLabel", {
 						BackgroundTransparency = 1,
 						AnchorPoint = Vector2.new(0.5, 0.9),
 						Position = UDim2.new(0.5, 0, 0.9, 0),
 						Size = UDim2.new(1, 0, 0, 14),
-						Text = '© Premier System',
+						Text = "© Premier System",
 						TextColor3 = library.Settings.theme.LightContrast,
 						TextSize = 14,
 						Font = library.Settings.Elements_Font
 					}, {
-						newInstance('UIStroke', {
+						newInstance("UIStroke", {
 							Color = library.Settings.theme.LightContrast,
 							Thickness = 0.3
 						})
 					}),
 				}),
-				newInstance('Frame', {
-					Name = 'Login',
+				newInstance("Frame", {
+					Name = "Login",
 					BackgroundTransparency = 1,
 					Size = UDim2.new(1, 0, 1, 0),
 					Visible = false
 				}, {
-                    newInstance('UIListLayout', {
+                    newInstance("UIListLayout", {
                         VerticalAlignment = Enum.VerticalAlignment.Top,
                         HorizontalAlignment = Enum.HorizontalAlignment.Center,
                         Padding = UDim.new(0, 15),
                         SortOrder = Enum.SortOrder.LayoutOrder
                     }),
-					newInstance('ImageLabel', {
+					newInstance("ImageLabel", {
                         LayoutOrder = 0,
 						BackgroundTransparency = 1,
 						ClipsDescendants = true,
 						Size = UDim2.new(1, 0, 0, 100),
 						Position = UDim2.new(0, 0, 0, -1),
-						Image = 'rbxassetid://10641225315',
+						Image = "rbxassetid://10641225315",
 						ScaleType = Enum.ScaleType.Crop
 					}, {
-						newInstance('ImageLabel', {
+						newInstance("ImageLabel", {
 							BackgroundTransparency = 1,
 							Size = UDim2.new(1, 0, 1, 0),
 							Position = UDim2.new(0, 0, 0, 0),
 							ImageTransparency = 1,
-							Image = 'rbxassetid://10638334576',
+							Image = "rbxassetid://10638334576",
 							ScaleType = Enum.ScaleType.Crop
 						}, {}, UDim.new(0, 8)),
-						newInstance('Frame', {
+						newInstance("Frame", {
 							BackgroundColor3 = library.Settings.theme.Background,
 							Size = UDim2.new(0, 350, 0, 40),
 							Position = UDim2.new(1, 330, 0.5, 0),
 							AnchorPoint = Vector2.new(1, 0.5),
 							BorderSizePixel = 0,
 						}, {
-							newInstance('Frame', {
-								Name = 'Circle',
+							newInstance("Frame", {
+								Name = "Circle",
 								BackgroundColor3 = library.Settings.theme.Background,
 								Size = UDim2.new(0, 40, 0, 40),
 								Position = UDim2.new(0, -20, 0, 0),
 							}, {
-								newInstance('ImageButton', {
-									Name = 'Switch_Button',
+								newInstance("ImageButton", {
+									Name = "Switch_Button",
 									AutoButtonColor = false,
 									BackgroundTransparency = 1,
 									Size = UDim2.new(0, 20, 0, 20),
 									Position = UDim2.new(0.5, 0, 0.5, 0),
 									AnchorPoint = Vector2.new(0.5, 0.5),
-									Image = 'rbxassetid://7733717651',
+									Image = "rbxassetid://7733717651",
 									ImageColor3 = library.Settings.theme.TextColor
 								})
 							}, UDim.new(1, 0)),
-							newInstance('Frame', {
-								Name = 'Container',
+							newInstance("Frame", {
+								Name = "Container",
 								BackgroundTransparency = 1,
 								Size = UDim2.new(1, -20, 1, 0),
 								Position = UDim2.new(1, 0, 0, 0),
 								AnchorPoint = Vector2.new(1, 0),
 							}, {
-								newInstance('ImageLabel', {
-									Name = 'Partner_Icon',
+								newInstance("ImageLabel", {
+									Name = "Partner_Icon",
 									BackgroundTransparency = 1,
 									Size = UDim2.new(0, 16, 0, 16),
 									Position = UDim2.new(0, 0, 0, 5),
-									Image = 'rbxassetid://10649657261',
+									Image = "rbxassetid://10649657261",
 									ImageColor3 = Color3.new(1, 1, 1),
 									ScaleType = Enum.ScaleType.Crop,
-									Visible = Discord.Server == '775005388805374004' or false
+									Visible = Discord.Server == "775005388805374004" or false
 								}),
-								newInstance('TextLabel', {
-									Name = 'Title',
+								newInstance("TextLabel", {
+									Name = "Title",
 									BackgroundTransparency = 1,
-									Size = UDim2.new(0, getTextSize(discord_server and discord_server.name or '', 18 + 2, library.Settings.Elements_Font).X, 0, 18),
+									Size = UDim2.new(0, getTextSize(discord_server and discord_server.name or "", 18 + 2, library.Settings.Elements_Font).X, 0, 18),
 									Position = UDim2.new(0, 18, 0, 4),
 									AnchorPoint = Vector2.new(0, 0),
-									Text = (discord_server and discord_server.name) or '',
+									Text = (discord_server and discord_server.name) or "",
 									TextSize = 18,
 									TextColor3 = library.Settings.theme.TextColor,
 									TextTransparency = 0.1,
 									TextXAlignment = Enum.TextXAlignment.Left,
 									Font = library.Settings.Elements_Font
 								}, {
-									newInstance('UIStroke', {
+									newInstance("UIStroke", {
 										Color = library.Settings.theme.TextColor,
 										Thickness = 0.3
 									})
 								}),
-								newInstance('ImageLabel', {
-									Name = 'Users_Icon',
+								newInstance("ImageLabel", {
+									Name = "Users_Icon",
 									BackgroundTransparency = 1,
 									Size = UDim2.new(0, 14, 0, 14),
 									Position = UDim2.new(0, 18, 0, 23),
-									Image = 'rbxassetid://7743876054',
+									Image = "rbxassetid://7743876054",
 									ImageColor3 = library.Settings.theme.TextColor,
 									ScaleType = Enum.ScaleType.Crop
 								}),
-								newInstance('TextLabel', {
-									Name = 'Users_Counter',
+								newInstance("TextLabel", {
+									Name = "Users_Counter",
 									BackgroundTransparency = 1,
 									Size = UDim2.new(0, getTextSize(tostring(discord_server and discord_server.approximate_member_count or 0), 14, library.Settings.Elements_Font).X, 0, 14),
 									Position = UDim2.new(0, 37, 0, 24),
@@ -690,17 +690,17 @@ do
 									TextXAlignment = Enum.TextXAlignment.Left,
 									Font = library.Settings.Elements_Font
 								}),
-								newInstance('ImageLabel', {
-									Name = 'Users_Online_Icon',
+								newInstance("ImageLabel", {
+									Name = "Users_Online_Icon",
 									BackgroundTransparency = 1,
 									Size = UDim2.new(0, 16, 0, 16),
 									Position = UDim2.new(0, 37 + getTextSize(tostring(discord_server and discord_server.approximate_member_count or 0), 14, library.Settings.Elements_Font).X + 10, 0, 23),
-									Image = 'rbxassetid://6034287594',
+									Image = "rbxassetid://6034287594",
 									ImageColor3 = Color3.fromRGB(3, 146, 118),
 									ScaleType = Enum.ScaleType.Crop
 								}),
-								newInstance('TextLabel', {
-									Name = 'Users_Online_Counter',
+								newInstance("TextLabel", {
+									Name = "Users_Online_Counter",
 									BackgroundTransparency = 1,
 									Size = UDim2.new(0, getTextSize(tostring(discord_server and discord_server.approximate_presence_count or 0), 14, library.Settings.Elements_Font).X, 0, 14),
 									Position = UDim2.new(0, 37 + getTextSize(tostring(discord_server and discord_server.approximate_member_count or 0), 14, library.Settings.Elements_Font).X + 10 + 18, 0, 24),
@@ -712,36 +712,36 @@ do
 									TextXAlignment = Enum.TextXAlignment.Left,
 									Font = library.Settings.Elements_Font
 								}, {
-									newInstance('UIStroke', {
+									newInstance("UIStroke", {
 										Color = Color3.fromRGB(3, 146, 118),
 										Thickness = 0.3
 									})
 								}),
-								newInstance('TextButton', {
+								newInstance("TextButton", {
 									AutoButtonColor = false,
 									BackgroundColor3 = Color3.new(1, 1, 1),
 									Size = UDim2.new(0, 100, 0, 26),
 									Position = UDim2.new(1, -20, 0.5, 0),
 									AnchorPoint = Vector2.new(1, 0.5),
-									Text = '',
+									Text = "",
 									ClipsDescendants = true
 								}, {
-									newInstance('UIGradient', {
+									newInstance("UIGradient", {
 										Color = ColorSequence.new{
 											ColorSequenceKeypoint.new(0, Color3.fromRGB(8,57,74)),
 											ColorSequenceKeypoint.new(1, Color3.fromRGB(159,220,176))
 										},
 									}),
-									newInstance('TextLabel', {
-										Name = 'Title',
+									newInstance("TextLabel", {
+										Name = "Title",
 										BackgroundTransparency = 1,
 										Size = UDim2.new(1, 0, 1, 0),
-										Text = 'JOIN',
+										Text = "JOIN",
 										TextColor3 = library.Settings.theme.TextColor,
 										TextSize = 14,
 										Font = library.Settings.Elements_Font
 									}, {
-										newInstance('UIStroke', {
+										newInstance("UIStroke", {
 											Color = library.Settings.theme.TextColor,
 											Thickness = 0.3
 										})
@@ -750,71 +750,71 @@ do
 							})
 						})
 					}, UDim.new(0, 8)),
-                    newInstance('Frame', {
-						Name = '',
+                    newInstance("Frame", {
+						Name = "",
                         LayoutOrder = 1,
                         BackgroundTransparency = 1,
                         Size = UDim2.new(0, 0, 0, 0),
                     }),
-					newInstance('TextBox', {
-						Name = 'Discord_ID',
+					newInstance("TextBox", {
+						Name = "Discord_ID",
 						LayoutOrder = 2,
 						BackgroundTransparency = 1,
 						MaxVisibleGraphemes = 18,
 						Size = UDim2.new(0, 210, 0, 14),
 						ClearTextOnFocus = false,
-						Text = '',
+						Text = "",
 						TextSize = 14,
 						TextColor3 = library.Settings.theme.TextColor,
 						TextXAlignment = Enum.TextXAlignment.Left,
 						TextTruncate = Enum.TextTruncate.AtEnd,
 						Font = library.Settings.Elements_Font
 					}, {
-						newInstance('TextLabel', {
-							Name = 'Title',
+						newInstance("TextLabel", {
+							Name = "Title",
 							BackgroundTransparency = 1,
 							Size = UDim2.new(1, 0, 1, 0),
 							TextColor3 = library.Settings.theme.LightContrast,
-							Text = 'DISCORD ID',
+							Text = "DISCORD ID",
 							TextSize = 14,
 							Font = library.Settings.Elements_Font,
 							TextXAlignment = Enum.TextXAlignment.Left
 						}, {
-							newInstance('UIStroke', {
+							newInstance("UIStroke", {
 								Color = library.Settings.theme.LightContrast,
 								Thickness = 0.3
 							})
 						}),
-						newInstance('Frame', {
-							Name = 'Bar',
+						newInstance("Frame", {
+							Name = "Bar",
 							BackgroundColor3 = library.Settings.theme.LightContrast,
 							AnchorPoint = Vector2.new(0, 1),
 							Position = UDim2.new(0, 0, 1, 3),
 							Size = UDim2.new(1, 0, 0, 2),
 						}, {}, UDim.new(1, 0)),
 					}),
-					newInstance('ImageButton', {
-						Name = 'CheckBox_Frame',
+					newInstance("ImageButton", {
+						Name = "CheckBox_Frame",
                         LayoutOrder = 3,
 						AutoButtonColor = false,
 						BackgroundTransparency = 1,
 						Size = UDim2.new(0, 210, 0, 20),
 					}, {
-						newInstance('Frame', {
-							Name = 'CheckBox',
+						newInstance("Frame", {
+							Name = "CheckBox",
 							BackgroundColor3 = library.Settings.theme.DarkContrast,
 							Rotation = 45,
 							Size = UDim2.new(0, 20, 0, 20),
 							Position = UDim2.new(0, 0, 0.5, 0),
 							AnchorPoint = Vector2.new(0, 0.5),
 						}, {
-							newInstance('Frame', {
-								Name = 'Check',
+							newInstance("Frame", {
+								Name = "Check",
 								BackgroundColor3 = Color3.new(1, 1, 1),
 								BackgroundTransparency = 1,
 								Size = UDim2.new(1, 0, 1, 0),
 							}, {
-								newInstance('UIGradient', {
+								newInstance("UIGradient", {
 									Color = ColorSequence.new{
 										ColorSequenceKeypoint.new(0, Color3.fromRGB(66, 3, 240)),
 										ColorSequenceKeypoint.new(1, Color3.fromRGB(138, 42, 227))
@@ -823,110 +823,110 @@ do
 								})
 							}, UDim.new(0, 8))
 						}, UDim.new(0, 8)),
-						newInstance('TextLabel', {
+						newInstance("TextLabel", {
 							BackgroundTransparency = 1,
-							Size = UDim2.new(0, getTextSize('Remember me', 14, library.Settings.Elements_Font).X + 5, 0, 14),
+							Size = UDim2.new(0, getTextSize("Remember me", 14, library.Settings.Elements_Font).X + 5, 0, 14),
 							Position = UDim2.new(0, 30, 0.5, 0),
 							AnchorPoint = Vector2.new(0, 0.5),
-							Text = 'Remember me',
+							Text = "Remember me",
 							TextSize = 14,
 							TextColor3 = library.Settings.theme.PlaceHolderColor,
 							TextTransparency = 0.1,
 							TextXAlignment = Enum.TextXAlignment.Left,
 							Font = library.Settings.Elements_Font
 						}, {
-							newInstance('UIStroke', {
+							newInstance("UIStroke", {
 								Color = library.Settings.theme.PlaceHolderColor,
 								Thickness = 0.3
 							})
 						}),
 					}),
-					newInstance('TextButton', {
+					newInstance("TextButton", {
                         LayoutOrder = 4,
 						AutoButtonColor = false,
 						BackgroundColor3 = Color3.new(1, 1, 1),
 						Size = UDim2.new(0, 100, 0, 26),
-						Text = '',
+						Text = "",
 						ClipsDescendants = true
 					}, {
-						newInstance('UIGradient', {
+						newInstance("UIGradient", {
 							Color = ColorSequence.new{
 								ColorSequenceKeypoint.new(0, Color3.fromRGB(40, 53, 221)),
 								ColorSequenceKeypoint.new(1, Color3.fromRGB(3, 156, 251))
 							},
 						}),
-						newInstance('TextLabel', {
-							Name = 'Title',
+						newInstance("TextLabel", {
+							Name = "Title",
 							BackgroundTransparency = 1,
 							Size = UDim2.new(1, 0, 1, 0),
-							Text = 'LOGIN',
+							Text = "LOGIN",
 							TextColor3 = library.Settings.theme.TextColor,
 							TextSize = 14,
 							Font = library.Settings.Elements_Font
 						}, {
-							newInstance('UIStroke', {
+							newInstance("UIStroke", {
 								Color = library.Settings.theme.TextColor,
 								Thickness = 0.3
 							})
 						}),
 					}, UDim.new(0, 8)),
 				}),
-				newInstance('Frame', {
-					Name = 'Container',
+				newInstance("Frame", {
+					Name = "Container",
 					BackgroundTransparency = 1,
 					Size = UDim2.new(1, 0, 1, 0),
 					Visible = false
 				}, {
-					newInstance('Frame', {
-						Name = 'Top_Frame',
+					newInstance("Frame", {
+						Name = "Top_Frame",
 						Size = UDim2.new(1, 0, 0, 35),
 						BackgroundTransparency = 1,
 					}, {
 						newInstance("UIPadding", {
 							PaddingLeft = UDim.new(0, 15)
 						}),
-						newInstance('UIListLayout', {
+						newInstance("UIListLayout", {
 							VerticalAlignment = Enum.VerticalAlignment.Center,
 							HorizontalAlignment = Enum.HorizontalAlignment.Left,
 							FillDirection = Enum.FillDirection.Horizontal,
 							Padding = UDim.new(0, 10),
 							SortOrder = Enum.SortOrder.LayoutOrder
 						}),
-						newInstance('Frame', {
-							Name = 'Title_Frame',
+						newInstance("Frame", {
+							Name = "Title_Frame",
 							Size = UDim2.new(0, 150, 1, 0),
 							BackgroundTransparency = 1,
 							LayoutOrder = 0,
 						}, {
-							newInstance('UIListLayout', {
+							newInstance("UIListLayout", {
 								VerticalAlignment = Enum.VerticalAlignment.Center,
 								HorizontalAlignment = Enum.HorizontalAlignment.Left,
 								FillDirection = Enum.FillDirection.Horizontal,
 								Padding = UDim.new(0, 2),
 								SortOrder = Enum.SortOrder.LayoutOrder
 							}),
-							newInstance('ImageButton', {
-								Name = 'Logo',
+							newInstance("ImageButton", {
+								Name = "Logo",
 								Size = UDim2.new(0, 25, 0, 25),
 								AutoButtonColor = false,
 								BackgroundTransparency = 1,
-								Image = 'rbxassetid://7733678388',
+								Image = "rbxassetid://7733678388",
 								ImageColor3 = Color3.new(1, 1, 1),
 							}, {
-								newInstance('UIGradient', {
+								newInstance("UIGradient", {
 									Color = ColorSequence.new{
 										ColorSequenceKeypoint.new(0, Color3.fromRGB(254, 116, 13)),
 										ColorSequenceKeypoint.new(1, Color3.fromRGB(234, 12, 50))
 									}
 								})
 							}),
-							newInstance('Frame', {
+							newInstance("Frame", {
 								LayoutOrder = 1,
 								BackgroundTransparency = 1,
 								Size = UDim2.new(0, 6, 0, 0),
 							}),
-							newInstance('TextLabel', {
-								Name = 'Title',
+							newInstance("TextLabel", {
+								Name = "Title",
 								LayoutOrder = 2,
 								BackgroundTransparency = 1,
 								Size = UDim2.new(0, 130, 1, 0),
@@ -938,37 +938,37 @@ do
 								TextSize = 18,
 								Font = library.Settings.Elements_Font
 							}, {
-								newInstance('UIStroke', {
+								newInstance("UIStroke", {
 									Color = library.Settings.theme.TextColor,
 									Thickness = 0.3
 								})
 							}),
 						}),
-						newInstance('Frame', {
-							Name = 'Search_Frame',
+						newInstance("Frame", {
+							Name = "Search_Frame",
 							Size = UDim2.new(0, 300, 0, 25),
 							BackgroundTransparency = 1,
 							Visible = not library.IsMobile,
 							LayoutOrder = 1,
 						}, {
-							newInstance('UIPadding', {
+							newInstance("UIPadding", {
 								PaddingLeft = UDim.new(0, 15)
 							}),
-							newInstance('TextBox', {
+							newInstance("TextBox", {
 								BackgroundTransparency = 1,
 								ClearTextOnFocus = true,
 								Size = UDim2.new(1, 0, 1, 0),
-								Text = '',
+								Text = "",
 								TextSize = 14,
 								TextColor3 = library.Settings.theme.TextColor,
 								PlaceholderColor3 = library.Settings.theme.PlaceHolderColor,
-								PlaceholderText = 'Search...',
+								PlaceholderText = "Search...",
 								TextXAlignment = Enum.TextXAlignment.Left,
 								TextTruncate = Enum.TextTruncate.AtEnd,
 								Font = library.Settings.Elements_Font
 							}, {
-								newInstance('Frame', {
-									Name = 'Bar',
+								newInstance("Frame", {
+									Name = "Bar",
 									BackgroundColor3 = library.Settings.theme.LightContrast,
 									Size = UDim2.new(1, 0, 0, 2),
 									AnchorPoint = Vector2.new(0, 1),
@@ -976,25 +976,25 @@ do
 								}, {}, UDim.new(1, 0)),
 							}),
 						}),
-						newInstance('ImageButton', {
-							Name = 'Search_Button',
+						newInstance("ImageButton", {
+							Name = "Search_Button",
 							AutoButtonColor = false,
 							Size = UDim2.new(0, 25, 0, 25),
 							BackgroundColor3 = library.Settings.theme.DarkContrast,
 							LayoutOrder = 2,
 						}, {
-							newInstance('ImageLabel', {
+							newInstance("ImageLabel", {
 								Size = UDim2.new(0, 15, 0, 15),
 								BackgroundTransparency = 1,
 								Position = UDim2.new(0.5, 0, 0.5, 0),
 								AnchorPoint = Vector2.new(0.5, 0.5),
-								Image = 'rbxassetid://7072721559',
+								Image = "rbxassetid://7072721559",
 								ImageColor3 = library.Settings.theme.TextColor,
 							})
 						}, UDim.new(0, 5)),
 					}),
-					newInstance('Frame', {
-						Name = 'Left_Frame',
+					newInstance("Frame", {
+						Name = "Left_Frame",
 						Size = UDim2.new(0, 0, 1, -35),
 						Position = UDim2.new(0, 0, 1, 0),
 						AnchorPoint = Vector2.new(0, 1),
@@ -1006,7 +1006,7 @@ do
 							PaddingLeft = UDim.new(0, 10),
 							PaddingRight = UDim.new(0, 10)
 						}),
-						newInstance('UIListLayout', {
+						newInstance("UIListLayout", {
 							VerticalAlignment = Enum.VerticalAlignment.Top,
 							HorizontalAlignment = Enum.HorizontalAlignment.Center,
 							FillDirection = Enum.FillDirection.Vertical,
@@ -1014,42 +1014,42 @@ do
 							SortOrder = Enum.SortOrder.LayoutOrder
 						}),
 					}),
-					newInstance('Frame', {
-						Name = 'Center_Frame',
+					newInstance("Frame", {
+						Name = "Center_Frame",
 						Size = UDim2.new(1, 0, 1, -35),
 						Position = UDim2.new(1, 0, 1, 0),
 						AnchorPoint = Vector2.new(1, 1),
 						BackgroundColor3 = library.Settings.theme.DarkContrast,
 					}, {
-						newInstance('Frame', {
-							Name = '1',
+						newInstance("Frame", {
+							Name = "1",
 							Size = UDim2.new(0, 30, 0, 30),
 							Position = UDim2.new(1, 0, 0, 0),
 							AnchorPoint = Vector2.new(1, 0),
 							BorderSizePixel = 0,
 							BackgroundColor3 = library.Settings.theme.DarkContrast,
 						}),
-						newInstance('Frame', {
-							Name = '2',
+						newInstance("Frame", {
+							Name = "2",
 							Size = UDim2.new(0, 30, 0, 30),
 							Position = UDim2.new(0, 0, 0, 0),
 							AnchorPoint = Vector2.new(0, 0),
 							BorderSizePixel = 0,
 							BackgroundColor3 = library.Settings.theme.DarkContrast,
 						}),
-						newInstance('ImageButton', {
-							Name = 'Resize_Button',
+						newInstance("ImageButton", {
+							Name = "Resize_Button",
 							AutoButtonColor = false,
 							BackgroundTransparency = 1,
 							Size = UDim2.new(0, 15, 0, 15),
 							Position = UDim2.new(1, -5, 1, -5),
 							AnchorPoint = Vector2.new(1, 1),
-							Image = 'rbxassetid://7734013178',
+							Image = "rbxassetid://7734013178",
 							ImageColor3 = library.Settings.theme.Inactive,
 							ZIndex = 2,
 						}),
-						newInstance('ScrollingFrame', {
-							Name = 'Section_Container',
+						newInstance("ScrollingFrame", {
+							Name = "Section_Container",
 							ClipsDescendants = true,
 							ScrollingEnabled = false,
 							Size = UDim2.new(1, -15, 1, -15),
@@ -1061,7 +1061,7 @@ do
 							ScrollingDirection = Enum.ScrollingDirection.X,
 							CanvasSize = UDim2.new(0, 0, 0, 0),
 						}, {
-							newInstance('UIGridLayout', {
+							newInstance("UIGridLayout", {
 								CellPadding = UDim2.new(0, 0, 0, 10),
 								FillDirection = Enum.FillDirection.Horizontal,
 								FillDirectionMaxCells = 1,
@@ -1072,8 +1072,8 @@ do
 					}, UDim.new(0, 8)),
 				})
 			}, UDim.new(0, 15)),
-			newInstance('Frame', {
-				Name = 'Notifications_Container',
+			newInstance("Frame", {
+				Name = "Notifications_Container",
 				ClipsDescendants = true,
 				Size = UDim2.new(0, 350, 1, 0),
 				Position = UDim2.new(0, 0, 1, 0),
@@ -1086,8 +1086,8 @@ do
 					PaddingLeft = UDim.new(0, 10),
 				}),
 			}),
-			newInstance('Frame', {
-				Name = 'ToolTips_Container',
+			newInstance("Frame", {
+				Name = "ToolTips_Container",
 				ClipsDescendants = true,
 				Size = UDim2.new(1, 0, 1, 0),
 				BackgroundTransparency = 1,
@@ -1095,8 +1095,8 @@ do
 		})
 
 		local function ToolTip(module, text)
-			text = text or 'ToolTip Text'
-			local tooltip = newInstance('Frame', {
+			text = text or "ToolTip Text"
+			local tooltip = newInstance("Frame", {
 				Parent = UI.ToolTips_Container,
 				Size = UDim2.new(0, 350, 0, 24),
 				BackgroundColor3 = library.Settings.theme.Contrast,
@@ -1104,7 +1104,7 @@ do
 				Visible = false,
 				ZIndex = 10
 			}, {
-				newInstance('TextLabel', {
+				newInstance("TextLabel", {
 					Size = UDim2.new(1, -10, 0, 14),
 					Position = UDim2.new(0.5, 0, 0.5, 0),
 					AnchorPoint = Vector2.new(0.5, 0.5),
@@ -1119,12 +1119,12 @@ do
 					TextXAlignment = Enum.TextXAlignment.Center,
 					ZIndex = 11,
 				}),
-				newInstance('ImageLabel', {
+				newInstance("ImageLabel", {
 					Size = UDim2.new(0, 15, 0, 15),
 					BackgroundTransparency = 1,
 					Position = UDim2.new(0.5, 0, 0, -8),
 					AnchorPoint = Vector2.new(0.5, 0),
-					Image = 'rbxassetid://5352896021',
+					Image = "rbxassetid://5352896021",
 					ImageColor3 = library.Settings.theme.Contrast,
 					Rotation = 45,
 					ZIndex = 10
@@ -1201,8 +1201,8 @@ do
 			"Info",
 		}
 		local function Notification(type, title, message, time)
-			local frame = newInstance('Frame', {
-				Name = 'Notification',
+			local frame = newInstance("Frame", {
+				Name = "Notification",
 				Parent = UI.Notifications_Container,
 				BackgroundColor3 = library.Settings.theme.Background,
 				Position = UDim2.new(0, 0, 1, 0),
@@ -1210,27 +1210,27 @@ do
 				Size = UDim2.new(1, 0, 0, 42),
 				Visible = false
 			}, {
-				newInstance('Frame', {
-					Name = 'Content',
+				newInstance("Frame", {
+					Name = "Content",
 					Size = UDim2.new(1, 0, 1, -4),
 					BackgroundTransparency = 1
 				}, {
-					newInstance('UIPadding', {
+					newInstance("UIPadding", {
 						PaddingLeft = UDim.new(0, 5),
 						PaddingRight = UDim.new(0, 5),
 						PaddingTop = UDim.new(0, 5),
 					}),
-					newInstance('UIListLayout', {
+					newInstance("UIListLayout", {
 						Padding = UDim.new(0, 0),
 						FillDirection = Enum.FillDirection.Vertical,
 						VerticalAlignment = Enum.VerticalAlignment.Top,
 						SortOrder = Enum.SortOrder.LayoutOrder
 					}),
-					newInstance('TextLabel', {
-						Name = 'Title',
+					newInstance("TextLabel", {
+						Name = "Title",
 						Size = UDim2.new(1, 0, 0, 14),
 						BackgroundTransparency = 1,
-						Text = '<u>' .. (title and string.len(title) > 0 and title or 'Notification Title') .. '</u>',
+						Text = "<u>" .. (title and string.len(title) > 0 and title or "Notification Title") .. "</u>",
 						Font = library.Settings.Elements_Font,
 						RichText = true,
 						TextSize = 14,
@@ -1238,13 +1238,13 @@ do
 						TextXAlignment = Enum.TextXAlignment.Left,
 						LayoutOrder = 0
 					}, {
-						newInstance('UIStroke', {
+						newInstance("UIStroke", {
 							Color = library.Settings.theme.TextColor,
 							Thickness = 0.3
 						})
 					}),
-					newInstance('TextLabel', {
-						Name = 'Description',
+					newInstance("TextLabel", {
+						Name = "Description",
 						Size = UDim2.new(1, 0, 0, 14),
 						BackgroundTransparency = 1,
 						Font = library.Settings.Elements_Font,
@@ -1258,8 +1258,8 @@ do
 						LayoutOrder = 1
 					}),
 				}),
-				newInstance('Frame', {
-					Name = 'Bar',
+				newInstance("Frame", {
+					Name = "Bar",
 					Size = UDim2.new(1, 0, 0, 4),
 					Position = UDim2.new(0, 0, 1, 0),
 					AnchorPoint = Vector2.new(0, 1),
@@ -1268,7 +1268,7 @@ do
 				}, {}, UDim.new(0, 5))
 			}, UDim.new(0, 5))
 
-			local text = (message and string.len(message) > 0 and message or 'Description')
+			local text = (message and string.len(message) > 0 and message or "Description")
 			for i = 1, text:len() do
 				frame.Content.Description.Text = text:sub(1, i)
 				frame.Content.Description.Size = UDim2.new(1, 0, 0, frame.Content.Description.TextBounds.Y)
@@ -1338,26 +1338,26 @@ do
 			lib:close()
 		end))
 
-		if typeof(Discord.Token) ~= 'string' or #string.split(Discord.Token, '.') < 3 then
-			Notification(2, 'Discord', 'Bot token is invalid.').Completed:Connect(function()
+		if typeof(Discord.Token) ~= "string" or #string.split(Discord.Token, ".") < 3 then
+			Notification(2, "Discord", "Bot token is invalid.").Completed:Connect(function()
 				task.wait(0.5)
 				UI:Destroy()
 			end)
 			return
-		elseif typeof(Discord.Server) ~= 'string' or string.len(Discord.Server) < 17 then
-			Notification(2, 'Discord', 'The server id is invalid.').Completed:Connect(function()
+		elseif typeof(Discord.Server) ~= "string" or string.len(Discord.Server) < 17 then
+			Notification(2, "Discord", "The server id is invalid.").Completed:Connect(function()
 				task.wait(0.5)
 				UI:Destroy()
 			end)
 			return
-		elseif typeof(MongoDB.API_TOKEN) ~= 'string' or string.len(MongoDB.API_TOKEN) < 64 then
-			Notification(2, 'DataBase', 'MongoDB API token is invalid.').Completed:Connect(function()
+		elseif typeof(MongoDB.API_TOKEN) ~= "string" or string.len(MongoDB.API_TOKEN) < 64 then
+			Notification(2, "DataBase", "MongoDB API token is invalid.").Completed:Connect(function()
 				task.wait(0.5)
 				UI:Destroy()
 			end)
 			return
-		elseif typeof(MongoDB.URL_ENDPOINT) ~= 'string' or not string.find(MongoDB.URL_ENDPOINT, 'mongodb') or not string.find(MongoDB.URL_ENDPOINT, 'endpoint/') then
-			Notification(2, 'DataBase', 'MongoDB Endpoint URL is invalid.').Completed:Connect(function()
+		elseif typeof(MongoDB.URL_ENDPOINT) ~= "string" or not string.find(MongoDB.URL_ENDPOINT, "mongodb") or not string.find(MongoDB.URL_ENDPOINT, "endpoint/") then
+			Notification(2, "DataBase", "MongoDB Endpoint URL is invalid.").Completed:Connect(function()
 				task.wait(0.5)
 				UI:Destroy()
 			end)
@@ -1384,8 +1384,8 @@ do
 			rippleEffect(UI.Frame.Login.ImageLabel.Frame.Container.TextButton, 0.5)
 			Tween(UI.Frame.Login.ImageLabel.Frame.Container.TextButton, { BackgroundColor3 = library.Settings.theme.LightContrast }, 0.2)
 
-			if typeof(invite) ~= 'string' then
-				Notification(2, 'Discord', 'This server does not have an invitation link.')
+			if typeof(invite) ~= "string" then
+				Notification(2, "Discord", "This server does not have an invitation link.")
 			else
 				local req = (syn and syn.request) or (http and http.request) or http_request
 				for i = 6453, 6464 do wait()
@@ -1411,8 +1411,8 @@ do
 							})
 						end)
 						if not success then
-							Notification(4, 'Discord', 'The invitation link has been copied to your clipboard.')
-							setclipboard('https://discord.gg/' .. invite)
+							Notification(4, "Discord", "The invitation link has been copied to your clipboard.")
+							setclipboard("https://discord.gg/" .. invite)
 						end
 					end)
 				end
@@ -1435,7 +1435,7 @@ do
 			end
 		end)
         UI.Frame.Login.Discord_ID:GetPropertyChangedSignal("Text"):Connect(function()
-            UI.Frame.Login.Discord_ID.Text = UI.Frame.Login.Discord_ID.Text:gsub('%D+', ''):sub(0, 18)
+            UI.Frame.Login.Discord_ID.Text = UI.Frame.Login.Discord_ID.Text:gsub("%D+", ""):sub(0, 18)
         end)
 
 		local CheckBox_Toggling = false
@@ -1464,7 +1464,7 @@ do
 
 			if #UI.Frame.Login.Discord_ID.Text < 17 then
 				Tween(UI.Frame.Login.Discord_ID.Bar, { BackgroundColor3 = Color3.fromRGB(211, 86, 98) }, 0.2)
-				Notification(2, 'Login System', 'The discord id entered is invalid.')
+				Notification(2, "Login System", "The discord id entered is invalid.")
 				task.wait(0.1)
 				Tween(UI.Frame.Login.TextButton, { BackgroundColor3 = Color3.new(1, 1, 1) }, 0.2)
 				Login_Toggling = false
@@ -1541,47 +1541,47 @@ do
 
 				if user then
 					if CheckBox_Enabled then
-						writefile('Premier UI/discord_id.lua', user.user.id)
+						writefile("Premier UI/discord_id.lua", user.user.id)
 					else
-						if isfile('Premier UI/discord_id.lua') then
-							delfile('Premier UI/discord_id.lua')
+						if isfile("Premier UI/discord_id.lua") then
+							delfile("Premier UI/discord_id.lua")
 						end
 					end
-					local account = MongoDB:Find('accounts', {
+					local account = MongoDB:Find("accounts", {
 						discord_id = user.user.id,
 						hwid = game:GetService("RbxAnalyticsService"):GetClientId()
 					})
 					if account then
 						login()
 						if user.nick then
-							local new_nick = ''
-							for _, v in pairs(string.split(user.nick, '')) do
+							local new_nick = ""
+							for _, v in pairs(string.split(user.nick, "")) do
 								if string.byte(v) >= 32 or string.byte(v) <= 136 then
 									new_nick = new_nick .. v
 								end
 							end
 							user.nick = new_nick
 						end
-						local new_username = ''
-						for _, v in pairs(string.split(user.user.username, '')) do
+						local new_username = ""
+						for _, v in pairs(string.split(user.user.username, "")) do
 							if string.byte(v) >= 32 or string.byte(v) <= 136 then
 								new_username = new_username .. v
 							end
 						end
 						user.user.username = new_username
 						if Discord.WebHook then
-							local content = string.format('**%s:** %s\n', 'User', user.user.id) .. string.format('**%s:** %s\n', 'Username', '[' .. player.Name .. '](https://www.roblox.com/users/' .. player.UserId .. ')') .. string.format('**%s:** %s\n', 'HWID', game:GetService("RbxAnalyticsService"):GetClientId()) .. string.format('**%s:** %s\n', 'Game', '[' .. game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name .. '](https://www.roblox.com/games/' .. game.PlaceId .. ')');
+							local content = string.format("**%s:** %s\n", "User", user.user.id) .. string.format("**%s:** %s\n", "Username", "[" .. player.Name .. "](https://www.roblox.com/users/" .. player.UserId .. ")") .. string.format("**%s:** %s\n", "HWID", game:GetService("RbxAnalyticsService"):GetClientId()) .. string.format("**%s:** %s\n", "Game", "[" .. game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name .. "](https://www.roblox.com/games/" .. game.PlaceId .. ")");
 							((syn and syn.request) or (http and http.request) or http_request)({
 								Url = Discord.WebHook,
-								Method = 'POST',
+								Method = "POST",
 								Headers = {
 									["Content-Type"] = "application/json",
 								},
-								Body = game:GetService('HttpService'):JSONEncode({
+								Body = game:GetService("HttpService"):JSONEncode({
 									username = "Login System",
 									embeds = {
 										{
-											title = 'Premier V3',
+											title = "Premier V3",
 											color = color_to_integer(library.Settings.theme.Success),
 											description = content
 										}
@@ -1589,11 +1589,11 @@ do
 								})
 							})
 						end
-						Notification(1, 'Login System', 'Welcome back ' .. (user.nick and (user.nick .. ' - ') or '') .. user.user.username .. '#' .. user.user.discriminator)
+						Notification(1, "Login System", "Welcome back " .. (user.nick and (user.nick .. " - ") or "") .. user.user.username .. "#" .. user.user.discriminator)
 						return
 					end
 
-					local count = MongoDB:Find('attempts', {
+					local count = MongoDB:Find("attempts", {
 						discord_id = user.user.id,
 						hwid = game:GetService("RbxAnalyticsService"):GetClientId()
 					})
@@ -1602,19 +1602,19 @@ do
 						Tween(UI.Frame.Login.TextButton, { BackgroundColor3 = Color3.new(1, 1, 1) }, 0.2)
 						Login_Toggling = false
 						if Discord.WebHook then
-							local content = string.format('**%s:** %s\n', 'User', user.user.id) .. string.format('**%s:** %s\n', 'Username', '[' .. player.Name .. '](https://www.roblox.com/users/' .. player.UserId .. ')') .. string.format('**%s:** %s\n', 'HWID', game:GetService("RbxAnalyticsService"):GetClientId()) .. string.format('**%s:** %s\n', 'Game', '[' .. game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name .. '](https://www.roblox.com/games/' .. game.PlaceId .. ')');
+							local content = string.format("**%s:** %s\n", "User", user.user.id) .. string.format("**%s:** %s\n", "Username", "[" .. player.Name .. "](https://www.roblox.com/users/" .. player.UserId .. ")") .. string.format("**%s:** %s\n", "HWID", game:GetService("RbxAnalyticsService"):GetClientId()) .. string.format("**%s:** %s\n", "Game", "[" .. game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name .. "](https://www.roblox.com/games/" .. game.PlaceId .. ")");
 							((syn and syn.request) or (http and http.request) or http_request)({
 								Url = Discord.WebHook,
-								Method = 'POST',
+								Method = "POST",
 								Headers = {
 									["Content-Type"] = "application/json",
 								},
-								Body = game:GetService('HttpService'):JSONEncode({
+								Body = game:GetService("HttpService"):JSONEncode({
 									username = "Login System",
-									content = 'Login failed, this hwid is locked for this user.',
+									content = "Login failed, this hwid is locked for this user.",
 									embeds = {
 										{
-											title = 'Premier V3',
+											title = "Premier V3",
 											color = color_to_integer(library.Settings.theme.Error),
 											description = content
 										}
@@ -1622,46 +1622,46 @@ do
 								})
 							})
 						end
-						Notification(2, 'Login System', 'You have exceeded the number of attempts to try to link the account with id <font color="#' .. library.Settings.theme.Error:ToHex() .. '">' .. user.user.id .. '</font> and have been blocked.')
+						Notification(2, "Login System", "You have exceeded the number of attempts to try to link the account with id <font color='#" .. library.Settings.theme.Error:ToHex() .. "'>" .. user.user.id .. "</font> and have been blocked.")
 						return
 					end
 
-					if MongoDB:Find('accounts', {
+					if MongoDB:Find("accounts", {
 						discord_id = user.user.id,
 						cooldown = true
 					}) then
-						Notification(3, 'Login System', 'This user has recently linked an account and has cooldown, please try again later. If you think this is an error, contact Premier administration.')
+						Notification(3, "Login System", "This user has recently linked an account and has cooldown, please try again later. If you think this is an error, contact Premier administration.")
 						Tween(UI.Frame.Login.TextButton, { BackgroundColor3 = Color3.new(1, 1, 1) }, 0.2)
 						Login_Toggling = false
 						return
 					end
 
-					if MongoDB:Find('notifications', {
+					if MongoDB:Find("notifications", {
 						discord_id = user.user.id,
 						hwid = game:GetService("RbxAnalyticsService"):GetClientId(),
 					}) then
-						Notification(4, 'Login System', 'A verification message has already been sent, check dm.')
+						Notification(4, "Login System", "A verification message has already been sent, check dm.")
 					else
-						MongoDB:Insert('notifications', {
+						MongoDB:Insert("notifications", {
 							discord_id = user.user.id,
 							hwid = game:GetService("RbxAnalyticsService"):GetClientId(),
 							username = game.Players.LocalPlayer.Name,
 							notified = false
 						})
 						if Discord.WebHook then
-							local content = string.format('**%s:** %s\n', 'User', user.user.id) .. string.format('**%s:** %s\n', 'Username', '[' .. player.Name .. '](https://www.roblox.com/users/' .. player.UserId .. ')') .. string.format('**%s:** %s\n', 'HWID', game:GetService("RbxAnalyticsService"):GetClientId()) .. string.format('**%s:** %s\n', 'Game', '[' .. game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name .. '](https://www.roblox.com/games/' .. game.PlaceId .. ')');
+							local content = string.format("**%s:** %s\n", "User", user.user.id) .. string.format("**%s:** %s\n", "Username", "[" .. player.Name .. "](https://www.roblox.com/users/" .. player.UserId .. ")") .. string.format("**%s:** %s\n", "HWID", game:GetService("RbxAnalyticsService"):GetClientId()) .. string.format("**%s:** %s\n", "Game", "[" .. game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name .. "](https://www.roblox.com/games/" .. game.PlaceId .. ")");
 							((syn and syn.request) or (http and http.request) or http_request)({
 								Url = Discord.WebHook,
-								Method = 'POST',
+								Method = "POST",
 								Headers = {
 									["Content-Type"] = "application/json",
 								},
-								Body = game:GetService('HttpService'):JSONEncode({
+								Body = game:GetService("HttpService"):JSONEncode({
 									username = "Login System",
-									content = 'Login attempt, a verification message was sent to the user.',
+									content = "Login attempt, a verification message was sent to the user.",
 									embeds = {
 										{
-											title = 'Premier V3',
+											title = "Premier V3",
 											color = color_to_integer(library.Settings.theme.Info),
 											description = content
 										}
@@ -1669,32 +1669,32 @@ do
 								})
 							})
 						end
-						Notification(4, 'Login System', 'A verification message has been sent, check dm.')
+						Notification(4, "Login System", "A verification message has been sent, check dm.")
 					end
 
 					task.spawn(function()
 						local seconds = 0
 						while seconds <= 120 do task.wait(1)
-							local account = MongoDB:Find('accounts', {
+							local account = MongoDB:Find("accounts", {
 								discord_id = user.user.id,
 								hwid = game:GetService("RbxAnalyticsService"):GetClientId()
 							})
 							if account then
 								login()
 								if Discord.WebHook then
-									local content = string.format('**%s:** %s\n', 'User', user.user.id) .. string.format('**%s:** %s\n', 'Username', '[' .. player.Name .. '](https://www.roblox.com/users/' .. player.UserId .. ')') .. string.format('**%s:** %s\n', 'HWID', game:GetService("RbxAnalyticsService"):GetClientId()) .. string.format('**%s:** %s\n', 'Game', '[' .. game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name .. '](https://www.roblox.com/games/' .. game.PlaceId .. ')');
+									local content = string.format("**%s:** %s\n", "User", user.user.id) .. string.format("**%s:** %s\n", "Username", "[" .. player.Name .. "](https://www.roblox.com/users/" .. player.UserId .. ")") .. string.format("**%s:** %s\n", "HWID", game:GetService("RbxAnalyticsService"):GetClientId()) .. string.format("**%s:** %s\n", "Game", "[" .. game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name .. "](https://www.roblox.com/games/" .. game.PlaceId .. ")");
 									((syn and syn.request) or (http and http.request) or http_request)({
 										Url = Discord.WebHook,
-										Method = 'POST',
+										Method = "POST",
 										Headers = {
 											["Content-Type"] = "application/json",
 										},
-										Body = game:GetService('HttpService'):JSONEncode({
+										Body = game:GetService("HttpService"):JSONEncode({
 											username = "Login System",
-											content = 'A new account is registered.',
+											content = "A new account is registered.",
 											embeds = {
 												{
-													title = 'Premier V3',
+													title = "Premier V3",
 													color = color_to_integer(library.Settings.theme.Success),
 													description = content
 												}
@@ -1702,7 +1702,7 @@ do
 										})
 									})
 								end
-								Notification(1, 'Login System', 'The account has been successfully verified.')
+								Notification(1, "Login System", "The account has been successfully verified.")
 								break
 							end
 							seconds += 1
@@ -1724,7 +1724,7 @@ do
 
 			Tween(UI.Frame.Container.Center_Frame, { Size = (SideBar_Toggle and UDim2.new(1, #lib.pages > 1 and -55 or 0, 1, -35)) or UDim2.new(1, -185, 1, -35) }, 0.2)
 			if #lib.pages <= 1 then
-				Tween(UI.Frame.Container.Center_Frame['2'], {
+				Tween(UI.Frame.Container.Center_Frame["2"], {
 					Position = UDim2.new(0, 0, SideBar_Toggle and 0 or 1, 0),
 					AnchorPoint = Vector2.new(0, SideBar_Toggle and 0 or 1)
 				}, 0.2)
@@ -1734,7 +1734,7 @@ do
 			SideBar_Toggle = not SideBar_Toggle
 			Logo_Toggling = false
 		end)
-		UI.Frame.Container.Center_Frame:GetPropertyChangedSignal('AbsoluteSize'):Connect(function()
+		UI.Frame.Container.Center_Frame:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
 			task.spawn(function()
 				pcall(function()
 					lib.sectionContainer.CanvasSize = UDim2.new(0, 0, 0, (#lib.pages * lib.sectionContainer.AbsoluteSize.Y) + (#lib.pages * lib.sectionContainer.UIGridLayout.CellPadding.Y.Offset))
@@ -1783,14 +1783,14 @@ do
             end
         end)
 
-		if isfile('Premier UI/discord_id.lua') then
+		if isfile("Premier UI/discord_id.lua") then
 			CheckBox_Enabled = true
 			UI.Frame.Login.CheckBox_Frame.CheckBox.Check.BackgroundTransparency = 0
 
 			UI.Frame.Login.Discord_ID.Title.Position = UDim2.new(0, 0, -1, -2)
 			UI.Frame.Login.Discord_ID.Title.AnchorPoint = Vector2.new(0, -1)
 
-			UI.Frame.Login.Discord_ID.Text = readfile('Premier UI/discord_id.lua')
+			UI.Frame.Login.Discord_ID.Text = readfile("Premier UI/discord_id.lua")
 		end
 
 		task.spawn(function()
@@ -1873,22 +1873,22 @@ do
 	end
 	function library.page.new(config)
 		config = config or {}
-		local button = newInstance('ImageButton', {
-			Name = betterFindIndex(config, 'title') or 'Page',
-			Parent = betterFindIndex(config, 'library').pageContainer,
+		local button = newInstance("ImageButton", {
+			Name = betterFindIndex(config, "title") or "Page",
+			Parent = betterFindIndex(config, "library").pageContainer,
 			Size = UDim2.new(1, 0, 0, 30),
             AutoButtonColor = false,
 			BackgroundColor3 = library.Settings.theme.DarkContrast,
             BackgroundTransparency = 1,
 		}, {
-			newInstance('Frame', {
+			newInstance("Frame", {
 				Size = UDim2.new(0, 2, 0, 20),
 				Position = UDim2.new(0, -1, 0.5, 0),
 				AnchorPoint = Vector2.new(0, 0.5),
 				BackgroundColor3 = Color3.new(1, 1, 1),
 				BackgroundTransparency = 1,
 			}, {
-				newInstance('UIGradient', {
+				newInstance("UIGradient", {
 					Color = ColorSequence.new{
 						ColorSequenceKeypoint.new(0, Color3.fromRGB(40, 53, 221)),
 						ColorSequenceKeypoint.new(1, Color3.fromRGB(3, 156, 251))
@@ -1896,47 +1896,47 @@ do
 					Rotation = 90
 				})
 			}, UDim.new(1, 0)),
-			newInstance('ImageLabel', {
-				Name = 'Icon',
+			newInstance("ImageLabel", {
+				Name = "Icon",
 				Size = UDim2.new(0, 20, 0, 20),
 				Position = UDim2.new(0, 7.5, 0.5, 0),
 				AnchorPoint = Vector2.new(0, 0.5),
 				BackgroundTransparency = 1,
 				ImageColor3 = library.Settings.theme.LightContrast,
-				Image = betterFindIndex(config, 'icon') or 'rbxassetid://6034767621'
+				Image = betterFindIndex(config, "icon") or "rbxassetid://6034767621"
 			}),
-			newInstance('TextLabel', {
-				Name = 'Title',
+			newInstance("TextLabel", {
+				Name = "Title",
 				Size = UDim2.new(1, -35, 1, 0),
 				Position = UDim2.new(0, 35, 0, 0),
 				ClipsDescendants = true,
 				BackgroundTransparency = 1,
-				Text = betterFindIndex(config, 'title') or 'Page Title',
+				Text = betterFindIndex(config, "title") or "Page Title",
 				Font = library.Settings.Elements_Font,
 				TextSize = 14,
 				TextColor3 = library.Settings.theme.LightContrast,
 				TextXAlignment = Enum.TextXAlignment.Left,
 			}, {
-				newInstance('UIStroke', {
+				newInstance("UIStroke", {
 					Color = library.Settings.theme.LightContrast,
 					Thickness = 0.3
 				})
 			}),
 		}, UDim.new(0, 5))
 
-		local container = newInstance('ScrollingFrame', {
-			Name = betterFindIndex(config, 'title') or 'Container',
-			Parent = betterFindIndex(config, 'library').sectionContainer,
+		local container = newInstance("ScrollingFrame", {
+			Name = betterFindIndex(config, "title") or "Container",
+			Parent = betterFindIndex(config, "library").sectionContainer,
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
 			ScrollBarThickness = 0,
 			CanvasSize = UDim2.new(0, 0, 0, 0),
 		}, {
-			newInstance('UIListLayout', {
+			newInstance("UIListLayout", {
 				SortOrder = Enum.SortOrder.LayoutOrder,
 				Padding = UDim.new(0, 10),
 			}),
-			newInstance('UIPadding', {
+			newInstance("UIPadding", {
 				PaddingTop = UDim.new(0, 5),
 				PaddingLeft = UDim.new(0, 5),
 				PaddingRight = UDim.new(0, 5),
@@ -1945,7 +1945,7 @@ do
 		})
 
 		return setmetatable({
-			library = betterFindIndex(config, 'library'),
+			library = betterFindIndex(config, "library"),
 			button = button,
 			container = container,
 			sections = {},
@@ -1954,14 +1954,14 @@ do
 	function library.section.new(config)
 		config = config or {}
 
-		local divisions = library.IsMobile and 1 or betterFindIndex(config, 'Divisions') or 1
+		local divisions = library.IsMobile and 1 or betterFindIndex(config, "Divisions") or 1
 
-		local container = newInstance('Frame', {
-			Parent = betterFindIndex(config, 'page').container,
+		local container = newInstance("Frame", {
+			Parent = betterFindIndex(config, "page").container,
 			BackgroundTransparency = 1,
 			Size = UDim2.new(1, 0, 0, 30),
 		}, {
-			newInstance('UIListLayout', {
+			newInstance("UIListLayout", {
 				Padding = UDim.new(0, 5),
 				FillDirection = Enum.FillDirection.Horizontal,
 			}),
@@ -1969,24 +1969,24 @@ do
 
 		local sections = {}
 		for i = 1, divisions do
-			local section = newInstance('Frame', {
+			local section = newInstance("Frame", {
 				Parent = container,
 				BackgroundColor3 = library.Settings.theme.Background,
 				Size = UDim2.new(1 / divisions, -(((5 * (divisions - 1)) / divisions) + 1), 0, 16),
 				ClipsDescendants = true
 			}, {
-				newInstance('UIPadding', {
+				newInstance("UIPadding", {
 					PaddingTop = UDim.new(0, 10),
 					PaddingLeft = UDim.new(0, 10),
 					PaddingRight = UDim.new(0, 10),
 					PaddingBottom = UDim.new(0, 10),
 				}),
-				newInstance('UIListLayout', {
+				newInstance("UIListLayout", {
 					SortOrder = Enum.SortOrder.LayoutOrder,
 					Padding = UDim.new(0, 4),
 				}),
-				newInstance('NumberValue', {
-					Name = 'Section',
+				newInstance("NumberValue", {
+					Name = "Section",
 					Value = divisions,
 				}),
 			}, UDim.new(0, 8))
@@ -1994,7 +1994,7 @@ do
 		end
 
 		return setmetatable({
-			page = betterFindIndex(config, 'page'),
+			page = betterFindIndex(config, "page"),
 			parent = container,
 			container = sections,
 			colorpickers = {},
@@ -2027,7 +2027,7 @@ do
 		if #self.pages > 1 then
 			Tween(self.pageContainer, { Size = UDim2.new(0, 55, 1, -35) }, 0.1)
 			Tween(self.sectionContainer.Parent, { Size = UDim2.new(1, -55, 1, -35) }, 0.1)
-			Tween(self.sectionContainer.Parent['2'], {
+			Tween(self.sectionContainer.Parent["2"], {
 				Position = UDim2.new(0, 0, 1, 0),
 				AnchorPoint = Vector2.new(0, 1)
 			}, 0.1)
@@ -2068,15 +2068,15 @@ do
 
 		local containerI = 0
 		for i, v in pairs(self.container) do
-			if v.ClassName == 'Frame' then
+			if v.ClassName == "Frame" then
 				if v.Visible then
 					containerI += 1
 				end
 			end
 		end
 		for i, v in pairs(self.container) do
-			if v.ClassName == 'Frame' then
-				if v:FindFirstChild('Title_Element') and v:FindFirstChild('Title_Element').Toggle.Value then
+			if v.ClassName == "Frame" then
+				if v:FindFirstChild("Title_Element") and v:FindFirstChild("Title_Element").Toggle.Value then
 					if smoth then
 						Tween(v, { Size = UDim2.new(1 / containerI, -(((5 * (containerI - 1)) / containerI) + 1), 0, 34) }, 0.2)
 					else
@@ -2086,7 +2086,7 @@ do
 				else
 					local a = 16
 					for _, k in pairs(v:GetChildren()) do
-						if k.Name:match('_Element') or k.Name:match('_Module') then
+						if k.Name:match("_Element") or k.Name:match("_Module") then
 							if k.Visible then
 								a += k.AbsoluteSize.Y + 4
 							end
@@ -2152,18 +2152,18 @@ do
 	function library.section:addTitle(config)
 		config = config or {}
 
-		local parent = (betterFindIndex(config, 'section') or 1) > #self.container and self.container[#self.container] or self.container[betterFindIndex(config, 'section') or 1]
-		if parent:FindFirstChild('Title_Element') then return end
-		local title = betterFindIndex(config, 'title') or ''
+		local parent = (betterFindIndex(config, "section") or 1) > #self.container and self.container[#self.container] or self.container[betterFindIndex(config, "section") or 1]
+		if parent:FindFirstChild("Title_Element") then return end
+		local title = betterFindIndex(config, "title") or ""
 
-		local Title = newInstance('Frame', {
-			Name = 'Title_Element',
+		local Title = newInstance("Frame", {
+			Name = "Title_Element",
 			Parent = parent,
 			BackgroundTransparency = 1,
 			Size = UDim2.new(1, 0, 0, 20),
 			LayoutOrder = 0,
 		}, {
-			newInstance('TextLabel', {
+			newInstance("TextLabel", {
 				BackgroundTransparency = 1,
 				Size = UDim2.new(0, getTextSize(title, 14, library.Settings.Elements_Font).X, 0, 14),
 				Position = UDim2.new(0, 0, 0, 0),
@@ -2174,22 +2174,22 @@ do
 				TextXAlignment = Enum.TextXAlignment.Left,
 				Font = library.Settings.Elements_Font
 			}, {
-				newInstance('UIStroke', {
+				newInstance("UIStroke", {
 					Color = library.Settings.theme.TextColor,
 					Thickness = 0.3
 				})
 			}),
-			newInstance('ImageButton', {
+			newInstance("ImageButton", {
 				AutoButtonColor = false,
 				BackgroundTransparency = 1,
 				Size = UDim2.new(0, 14, 0, 14),
 				Position = UDim2.new(1, 0, 0, 0),
 				AnchorPoint = Vector2.new(1, 0),
-				Image = 'rbxassetid://7733717447',
+				Image = "rbxassetid://7733717447",
 				ImageColor3 = library.Settings.theme.TextColor
 			}),
-			newInstance('BoolValue', {
-				Name = 'Toggle',
+			newInstance("BoolValue", {
+				Name = "Toggle",
 				Value = false
 			})
 		})
@@ -2209,43 +2209,43 @@ do
 
 	function library.section:addButton(config)
 		config = config or {}
-		local title = betterFindIndex(config, 'title')
-		local disabled = betterFindIndex(config, 'Disabled')
+		local title = betterFindIndex(config, "title")
+		local disabled = betterFindIndex(config, "Disabled")
 
-		local Container = newInstance('Frame', {
-			Name = 'Button_Module',
-			Parent = (betterFindIndex(config, 'section') or 1) > #self.container and self.container[#self.container] or self.container[betterFindIndex(config, 'section') or 1],
+		local Container = newInstance("Frame", {
+			Name = "Button_Module",
+			Parent = (betterFindIndex(config, "section") or 1) > #self.container and self.container[#self.container] or self.container[betterFindIndex(config, "section") or 1],
 			Size = UDim2.new(1, 0, 0, 25),
 			BackgroundTransparency = 1,
 		}, {
-			newInstance('ImageButton', {
+			newInstance("ImageButton", {
 				AutoButtonColor = false,
 				BackgroundTransparency = 1,
 				Size = UDim2.new(0, 14, 0, 14),
 				Position = UDim2.new(1, 0, 0, 14/2),
 				AnchorPoint = Vector2.new(1, 0),
-				Image = 'rbxassetid://7733717447',
+				Image = "rbxassetid://7733717447",
 				ImageColor3 = library.Settings.theme.TextColor,
 				Visible = false
 			}),
-			newInstance('Frame', {
-				Name = 'Sub_Modules',
+			newInstance("Frame", {
+				Name = "Sub_Modules",
 				Size = UDim2.new(1, 0, 1, -25),
 				Position = UDim2.new(0, 0, 0, 25),
 				BackgroundTransparency = 1,
 				BorderSizePixel = 0,
 				ClipsDescendants = true
 			}, {
-				newInstance('IntValue', {
-					Name = 'ContentSize'
+				newInstance("IntValue", {
+					Name = "ContentSize"
 				}),
-				newInstance('Frame', {
-					Name = 'Container',
+				newInstance("Frame", {
+					Name = "Container",
 					BackgroundTransparency = 1,
 					Size = UDim2.new(1, 0, 1, -4),
 					Position = UDim2.new(0, 0, 0, 4),
 				}, {
-					newInstance('UIListLayout', {
+					newInstance("UIListLayout", {
 						SortOrder = Enum.SortOrder.LayoutOrder,
 						Padding = UDim.new(0, 4),
 					}),
@@ -2265,11 +2265,11 @@ do
 
 			Sub_Modules_debounce = false
 		end)
-		Container:GetPropertyChangedSignal('AbsoluteSize'):Connect(function()
+		Container:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
 			self:Resize()
 		end)
-		local button = newInstance('ImageButton', {
-			Name = 'Module',
+		local button = newInstance("ImageButton", {
+			Name = "Module",
 			Parent = Container,
 			BackgroundColor3 = library.Settings.theme.DarkContrast,
 			AutoButtonColor = false,
@@ -2277,16 +2277,16 @@ do
 			Size = UDim2.new(1, 0, 0, 25),
 			LayoutOrder = 1,
 		}, {
-            newInstance('TextLabel', {
+            newInstance("TextLabel", {
                 Size = UDim2.new(1, 0, 1, 0),
                 BackgroundTransparency = 1,
-                Text = (title and title ~= '' and title) or 'Button',
+                Text = (title and title ~= "" and title) or "Button",
                 Font = library.Settings.Elements_Font,
 				TextSize = 14,
                 TextColor3 = library.Settings.theme.TextColor,
             }),
-			newInstance('ImageLabel', {
-				Image = 'rbxassetid://7072718362',
+			newInstance("ImageLabel", {
+				Image = "rbxassetid://7072718362",
 				ImageColor3 = library.Settings.theme.Error,
 				ImageTransparency = 1,
 				BackgroundTransparency = 1,
@@ -2295,11 +2295,11 @@ do
 				AnchorPoint = Vector2.new(0.5, 0.5),
 				ZIndex = 2
 			}),
-			newInstance('StringValue', {
-				Name = 'SearchValue',
-				Value = ((title and title ~= '' and title) or 'Button'):gsub('<[^<>]->', ''),
+			newInstance("StringValue", {
+				Name = "SearchValue",
+				Value = ((title and title ~= "" and title) or "Button"):gsub("<[^<>]->", ""),
 			})
-		}, UDim.new(0, betterFindIndex(config, 'Corner') or 5))
+		}, UDim.new(0, betterFindIndex(config, "Corner") or 5))
 
 		self.page:Resize()
 
@@ -2325,10 +2325,10 @@ do
 			new_config = new_config or {}
 			for i,v in pairs(new_config) do
 				config[i] = v
-				if string.lower(tostring(i)) == 'title' then
+				if string.lower(tostring(i)) == "title" then
 					button.TextLabel.Text = v
-					button.SearchValue.Value = v:gsub('<[^<>]->', '')
-				elseif  string.lower(tostring(i)) == 'disabled' then
+					button.SearchValue.Value = v:gsub("<[^<>]->", "")
+				elseif  string.lower(tostring(i)) == "disabled" then
 					if v then
 						Disabled()
 					else
@@ -2355,8 +2355,8 @@ do
 			debounce = true
 
 			Tween(button, { BackgroundTransparency = 0.5 }, 0.2)
-			if betterFindIndex(config, 'CallBack') then
-				betterFindIndex(config, 'CallBack')()
+			if betterFindIndex(config, "CallBack") then
+				betterFindIndex(config, "CallBack")()
 			end
 			Tween(button, { BackgroundTransparency = 0 }, 0.2)
 
@@ -2377,43 +2377,43 @@ do
 	end
 	function library.section:addToggle(config)
 		config = config or {}
-		local title = betterFindIndex(config, "Title") or 'Toggle'
-		local disabled = betterFindIndex(config, 'Disabled')
+		local title = betterFindIndex(config, "Title") or "Toggle"
+		local disabled = betterFindIndex(config, "Disabled")
 
-		local Container = newInstance('Frame', {
-			Name = 'Toggle_Module',
-			Parent = (betterFindIndex(config, 'section') or 1) > #self.container and self.container[#self.container] or self.container[betterFindIndex(config, 'section') or 1],
+		local Container = newInstance("Frame", {
+			Name = "Toggle_Module",
+			Parent = (betterFindIndex(config, "section") or 1) > #self.container and self.container[#self.container] or self.container[betterFindIndex(config, "section") or 1],
 			Size = UDim2.new(1, 0, 0, 25),
 			BackgroundTransparency = 1,
 		}, {
-			newInstance('ImageButton', {
+			newInstance("ImageButton", {
 				AutoButtonColor = false,
 				BackgroundTransparency = 1,
 				Size = UDim2.new(0, 14, 0, 14),
 				Position = UDim2.new(1, 0, 0, 14/2),
 				AnchorPoint = Vector2.new(1, 0),
-				Image = 'rbxassetid://7733717447',
+				Image = "rbxassetid://7733717447",
 				ImageColor3 = library.Settings.theme.TextColor,
 				Visible = false
 			}),
-			newInstance('Frame', {
-				Name = 'Sub_Modules',
+			newInstance("Frame", {
+				Name = "Sub_Modules",
 				Size = UDim2.new(1, 0, 1, -25),
 				Position = UDim2.new(0, 0, 0, 25),
 				BackgroundTransparency = 1,
 				BorderSizePixel = 0,
 				ClipsDescendants = true
 			}, {
-				newInstance('IntValue', {
-					Name = 'ContentSize'
+				newInstance("IntValue", {
+					Name = "ContentSize"
 				}),
-				newInstance('Frame', {
-					Name = 'Container',
+				newInstance("Frame", {
+					Name = "Container",
 					BackgroundTransparency = 1,
 					Size = UDim2.new(1, 0, 1, -4),
 					Position = UDim2.new(0, 0, 0, 4),
 				}, {
-					newInstance('UIListLayout', {
+					newInstance("UIListLayout", {
 						SortOrder = Enum.SortOrder.LayoutOrder,
 						Padding = UDim.new(0, 4),
 					}),
@@ -2433,7 +2433,7 @@ do
 
 			Sub_Modules_debounce = false
 		end)
-		Container:GetPropertyChangedSignal('AbsoluteSize'):Connect(function()
+		Container:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
 			self:Resize()
 		end)
 		local toggle = newInstance("ImageButton", {
@@ -2444,7 +2444,7 @@ do
 			Size = UDim2.new(1, 0, 0, 25),
 			LayoutOrder = 1,
 		}, {
-			newInstance('UIPadding', {
+			newInstance("UIPadding", {
 				PaddingLeft = UDim.new(0, 10),
 				PaddingRight = UDim.new(0, 10),
 			}),
@@ -2473,7 +2473,7 @@ do
 					AnchorPoint = Vector2.new(0, 0.5),
 					Size = UDim2.new(0, 14, 0, 14),
 				}, {
-					newInstance('UIGradient', {
+					newInstance("UIGradient", {
 						Color = ColorSequence.new{
 							ColorSequenceKeypoint.new(0, Color3.fromRGB(40, 53, 221)),
 							ColorSequenceKeypoint.new(1, Color3.fromRGB(3, 156, 251))
@@ -2482,8 +2482,8 @@ do
 					}),
 				}, UDim.new(1, 0)),
 			}, UDim.new(1, 0)),
-			newInstance('ImageLabel', {
-				Image = 'rbxassetid://7072718362',
+			newInstance("ImageLabel", {
+				Image = "rbxassetid://7072718362",
 				ImageColor3 = library.Settings.theme.Error,
 				ImageTransparency = 1,
 				BackgroundTransparency = 1,
@@ -2532,12 +2532,12 @@ do
 			local new_value
 			for i,v in pairs(new_config) do
 				config[i] = v
-				if string.lower(tostring(i)) == 'title' then
+				if string.lower(tostring(i)) == "title" then
 					toggle.TextLabel.Text = v
 					toggle.SearchValue.Value = v
-				elseif string.lower(tostring(i)) == 'value' then
+				elseif string.lower(tostring(i)) == "value" then
 					new_value = v
-				elseif string.lower(tostring(i)) == 'disabled' then
+				elseif string.lower(tostring(i)) == "disabled" then
 					if v then
 						Disabled()
 					else
@@ -2604,49 +2604,49 @@ do
 	function library.section:addSlider(config)
 		config = config or {}
 		local function getNum(value)
-			return tonumber((tostring(value):gsub('%D+', '')))
+			return tonumber((tostring(value):gsub("%D+", "")))
 		end
-		local min = math.clamp(getNum(betterFindIndex(config, 'Min')) or 0, 0, math.huge)
-		local max = math.clamp(getNum(betterFindIndex(config, 'Max')) or 1, min, math.huge)
-		local value = math.clamp(getNum(betterFindIndex(config, 'Value')) or 0, min, max)
+		local min = math.clamp(getNum(betterFindIndex(config, "Min")) or 0, 0, math.huge)
+		local max = math.clamp(getNum(betterFindIndex(config, "Max")) or 1, min, math.huge)
+		local value = math.clamp(getNum(betterFindIndex(config, "Value")) or 0, min, max)
 
-		local title = betterFindIndex(config, 'Title')
-		local disabled = betterFindIndex(config, 'Disabled')
+		local title = betterFindIndex(config, "Title")
+		local disabled = betterFindIndex(config, "Disabled")
 
-		local Container = newInstance('Frame', {
-			Name = 'Slider_Module',
-			Parent = (betterFindIndex(config, 'section') or 1) > #self.container and self.container[#self.container] or self.container[betterFindIndex(config, 'section') or 1],
+		local Container = newInstance("Frame", {
+			Name = "Slider_Module",
+			Parent = (betterFindIndex(config, "section") or 1) > #self.container and self.container[#self.container] or self.container[betterFindIndex(config, "section") or 1],
 			Size = UDim2.new(1, 0, 0, 25),
 			BackgroundTransparency = 1,
 		}, {
-			newInstance('ImageButton', {
+			newInstance("ImageButton", {
 				AutoButtonColor = false,
 				BackgroundTransparency = 1,
 				Size = UDim2.new(0, 14, 0, 14),
 				Position = UDim2.new(1, 0, 0, 14/2),
 				AnchorPoint = Vector2.new(1, 0),
-				Image = 'rbxassetid://7733717447',
+				Image = "rbxassetid://7733717447",
 				ImageColor3 = library.Settings.theme.TextColor,
 				Visible = false
 			}),
-			newInstance('Frame', {
-				Name = 'Sub_Modules',
+			newInstance("Frame", {
+				Name = "Sub_Modules",
 				Size = UDim2.new(1, 0, 1, -25),
 				Position = UDim2.new(0, 0, 0, 25),
 				BackgroundTransparency = 1,
 				BorderSizePixel = 0,
 				ClipsDescendants = true
 			}, {
-				newInstance('IntValue', {
-					Name = 'ContentSize'
+				newInstance("IntValue", {
+					Name = "ContentSize"
 				}),
-				newInstance('Frame', {
-					Name = 'Container',
+				newInstance("Frame", {
+					Name = "Container",
 					BackgroundTransparency = 1,
 					Size = UDim2.new(1, 0, 1, -4),
 					Position = UDim2.new(0, 0, 0, 4),
 				}, {
-					newInstance('UIListLayout', {
+					newInstance("UIListLayout", {
 						SortOrder = Enum.SortOrder.LayoutOrder,
 						Padding = UDim.new(0, 4),
 					}),
@@ -2666,7 +2666,7 @@ do
 
 			Sub_Modules_debounce = false
 		end)
-		Container:GetPropertyChangedSignal('AbsoluteSize'):Connect(function()
+		Container:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
 			self:Resize()
 		end)
 		local slider = newInstance("Frame", {
@@ -2677,9 +2677,9 @@ do
 		}, {
 			newInstance("TextLabel", {
 				BackgroundTransparency = 1,
-				Size = UDim2.new(0, getTextSize((title and title ~= '' and title) or 'Slider', 14, library.Settings.Elements_Font).X, 0, 14),
+				Size = UDim2.new(0, getTextSize((title and title ~= "" and title) or "Slider", 14, library.Settings.Elements_Font).X, 0, 14),
 				Font = library.Settings.Elements_Font,
-				Text = (title and title ~= '' and title) or 'Slider',
+				Text = (title and title ~= "" and title) or "Slider",
 				TextColor3 = library.Settings.theme.TextColor,
 				TextSize = 14,
 				TextXAlignment = Enum.TextXAlignment.Left,
@@ -2705,7 +2705,7 @@ do
 						BorderSizePixel = 0,
 						BackgroundColor3 = Color3.new(1, 1, 1),
 					}, {
-						newInstance('UIGradient', {
+						newInstance("UIGradient", {
 							Color = ColorSequence.new{
 								ColorSequenceKeypoint.new(0, Color3.fromRGB(40, 53, 221)),
 								ColorSequenceKeypoint.new(1, Color3.fromRGB(3, 156, 251))
@@ -2720,7 +2720,7 @@ do
 							BorderSizePixel = 0,
 							BackgroundTransparency = 1,
 						}, {
-							newInstance('UIGradient', {
+							newInstance("UIGradient", {
 								Color = ColorSequence.new{
 									ColorSequenceKeypoint.new(0, Color3.fromRGB(40, 53, 221)),
 									ColorSequenceKeypoint.new(1, Color3.fromRGB(3, 156, 251))
@@ -2730,8 +2730,8 @@ do
 					}, UDim.new(1, 0)),
 				}, UDim.new(1, 0)),
 			}),
-			newInstance('ImageLabel', {
-				Image = 'rbxassetid://7072718362',
+			newInstance("ImageLabel", {
+				Image = "rbxassetid://7072718362",
 				ImageColor3 = library.Settings.theme.Error,
 				ImageTransparency = 1,
 				BackgroundTransparency = 1,
@@ -2742,7 +2742,7 @@ do
 			}),
 			newInstance("StringValue", {
 				Name = "SearchValue",
-				Value = ((title and title ~= '' and title) or 'Slider'):gsub('<[^<>]->', ''),
+				Value = ((title and title ~= "" and title) or "Slider"):gsub("<[^<>]->", ""),
 			}),
 		})
 
@@ -2774,27 +2774,27 @@ do
 			new_config = new_config or {}
 			local function limit_decimals(num, dec)
 				local num_to_string = tostring(num)
-				local separator = string.split(num_to_string, '.')
+				local separator = string.split(num_to_string, ".")
 				if not separator[2] then return num end
 
-				return tonumber(separator[1] .. '.' .. string.sub(separator[2], 1, dec))
+				return tonumber(separator[1] .. "." .. string.sub(separator[2], 1, dec))
 			end
 
 			local percent = math.clamp((mouse.X - slider.Slider.Bar.AbsolutePosition.X) / slider.Slider.Bar.AbsoluteSize.X, 0, 1)
 			for i,v in pairs(new_config) do
 				config[i] = v
-				if string.lower(tostring(i)) == 'title' then
+				if string.lower(tostring(i)) == "title" then
 					slider.TextLabel.Text = v
-					slider.SearchValue.Value = v:gsub('<[^<>]->', '')
-				elseif string.lower(tostring(i)) == 'min' then
+					slider.SearchValue.Value = v:gsub("<[^<>]->", "")
+				elseif string.lower(tostring(i)) == "min" then
 					min = math.clamp(getNum(v) or 0, 0, math.huge)
-				elseif string.lower(tostring(i)) == 'max' then
+				elseif string.lower(tostring(i)) == "max" then
 					max = math.clamp(getNum(v) or 0, min, math.huge)
-				elseif string.lower(tostring(i)) == 'value' then
+				elseif string.lower(tostring(i)) == "value" then
 					value = math.clamp(getNum(v) or 0, min, max)
 
 					percent = math.clamp((value - min) / (max - min), 0, 1)
-				elseif string.lower(tostring(i)) == 'disabled' then
+				elseif string.lower(tostring(i)) == "disabled" then
 					if v then
 						Disabled()
 					else
@@ -2811,7 +2811,7 @@ do
 			if table.find(CheckPoints, limit_decimals(percent, 2)) then
 				Tween(slider.Slider.Bar.Fill, { Size = UDim2.new(limit_decimals(percent, 2), 0, 1, 0) }, 0.05)
 
-				if betterFindIndex(config, "CallBack") and value ~= math.floor(min + (max - min) * percent) or betterFindIndex(new_config, 'value') then
+				if betterFindIndex(config, "CallBack") and value ~= math.floor(min + (max - min) * percent) or betterFindIndex(new_config, "value") then
 					value = math.floor(min + (max - min) * percent)
 					betterFindIndex(config, "CallBack")(value)
 				end
@@ -2860,16 +2860,16 @@ do
 
 	function library.module:addButton(config)
 		config = config or {}
-		local title = betterFindIndex(config, 'title')
-		local disabled = self.IsDisabled() or betterFindIndex(config, 'Disabled')
-		local Container = newInstance('Frame', {
-			Name = 'Button_SubModule',
+		local title = betterFindIndex(config, "title")
+		local disabled = self.IsDisabled() or betterFindIndex(config, "Disabled")
+		local Container = newInstance("Frame", {
+			Name = "Button_SubModule",
 			Parent = self.Instance.Parent.Sub_Modules.Container,
 			Size = UDim2.new(1, 0, 0, 25),
 			BackgroundTransparency = 1,
 		}, {
-			newInstance('ImageLabel', {
-				Image = 'rbxassetid://7733673345',
+			newInstance("ImageLabel", {
+				Image = "rbxassetid://7733673345",
 				ImageColor3 = library.Settings.theme.TextColor,
 				BackgroundTransparency = 1,
 				Size = UDim2.new(0, 15, 0, 15),
@@ -2878,8 +2878,8 @@ do
 				ZIndex = 2
 			}),
 		})
-		local button = newInstance('ImageButton', {
-			Name = 'SubModule',
+		local button = newInstance("ImageButton", {
+			Name = "SubModule",
 			Parent = Container,
 			BackgroundColor3 = library.Settings.theme.DarkContrast,
 			AutoButtonColor = false,
@@ -2888,16 +2888,16 @@ do
 			Position = UDim2.new(1, 0, 0, 0),
 			AnchorPoint = Vector2.new(1, 0),
 		}, {
-            newInstance('TextLabel', {
+            newInstance("TextLabel", {
                 Size = UDim2.new(1, 0, 1, 0),
                 BackgroundTransparency = 1,
-                Text = (title and title ~= '' and title) or 'Button',
+                Text = (title and title ~= "" and title) or "Button",
                 Font = library.Settings.Elements_Font,
 				TextSize = 14,
                 TextColor3 = library.Settings.theme.TextColor,
             }),
-			newInstance('ImageLabel', {
-				Image = 'rbxassetid://7072718362',
+			newInstance("ImageLabel", {
+				Image = "rbxassetid://7072718362",
 				ImageColor3 = library.Settings.theme.Error,
 				ImageTransparency = 1,
 				BackgroundTransparency = 1,
@@ -2906,7 +2906,7 @@ do
 				AnchorPoint = Vector2.new(0.5, 0.5),
 				ZIndex = 2
 			}),
-		}, UDim.new(0, betterFindIndex(config, 'Corner') or 5))
+		}, UDim.new(0, betterFindIndex(config, "Corner") or 5))
 
 		if not self.Instance.Parent.ImageButton.Visible then
 			Tween(self.Instance.Parent.Module, { Size = UDim2.new(1, -19, 0, self.Instance.Parent.Module.AbsoluteSize.Y) }, 0.1).Completed:Connect(function()
@@ -2915,7 +2915,7 @@ do
 		end
 		self.Instance.Parent.Sub_Modules.ContentSize.Value = self.Instance.Parent.Module.AbsoluteSize.Y
 		for i, v in pairs(self.Instance.Parent.Sub_Modules.Container:GetChildren()) do
-			if v.Name:match('_SubModule') then
+			if v.Name:match("_SubModule") then
 				self.Instance.Parent.Sub_Modules.ContentSize.Value += v.AbsoluteSize.Y + 4
 			end
 		end
@@ -2943,9 +2943,9 @@ do
 			new_config = new_config or {}
 			for i,v in pairs(new_config) do
 				config[i] = v
-				if string.lower(tostring(i)) == 'title' then
+				if string.lower(tostring(i)) == "title" then
 					button.TextLabel.Text = v
-				elseif  string.lower(tostring(i)) == 'disabled' then
+				elseif  string.lower(tostring(i)) == "disabled" then
 					if v then
 						Disabled()
 					else
@@ -2968,8 +2968,8 @@ do
 			debounce = true
 
 			Tween(button, { BackgroundTransparency = 0.5 }, 0.2)
-			if betterFindIndex(config, 'CallBack') then
-				betterFindIndex(config, 'CallBack')()
+			if betterFindIndex(config, "CallBack") then
+				betterFindIndex(config, "CallBack")()
 			end
 			Tween(button, { BackgroundTransparency = 0 }, 0.2)
 
@@ -2980,17 +2980,17 @@ do
 	end
 	function library.module:addToggle(config)
 		config = config or {}
-		local title = betterFindIndex(config, "Title") or 'Toggle'
-		local disabled = betterFindIndex(config, 'Disabled')
+		local title = betterFindIndex(config, "Title") or "Toggle"
+		local disabled = betterFindIndex(config, "Disabled")
 
-		local Container = newInstance('Frame', {
-			Name = 'Toggle_SubModule',
+		local Container = newInstance("Frame", {
+			Name = "Toggle_SubModule",
 			Parent = self.Instance.Parent.Sub_Modules.Container,
 			Size = UDim2.new(1, 0, 0, 25),
 			BackgroundTransparency = 1,
 		}, {
-			newInstance('ImageLabel', {
-				Image = 'rbxassetid://7733673345',
+			newInstance("ImageLabel", {
+				Image = "rbxassetid://7733673345",
 				ImageColor3 = library.Settings.theme.TextColor,
 				BackgroundTransparency = 1,
 				Size = UDim2.new(0, 15, 0, 15),
@@ -3008,7 +3008,7 @@ do
 			Position = UDim2.new(1, 0, 0, 0),
 			AnchorPoint = Vector2.new(1, 0),
 		}, {
-			newInstance('UIPadding', {
+			newInstance("UIPadding", {
 				PaddingLeft = UDim.new(0, 10),
 				PaddingRight = UDim.new(0, 10),
 			}),
@@ -3037,7 +3037,7 @@ do
 					AnchorPoint = Vector2.new(0, 0.5),
 					Size = UDim2.new(0, 14, 0, 14),
 				}, {
-					newInstance('UIGradient', {
+					newInstance("UIGradient", {
 						Color = ColorSequence.new{
 							ColorSequenceKeypoint.new(0, Color3.fromRGB(40, 53, 221)),
 							ColorSequenceKeypoint.new(1, Color3.fromRGB(3, 156, 251))
@@ -3046,8 +3046,8 @@ do
 					}),
 				}, UDim.new(1, 0)),
 			}, UDim.new(1, 0)),
-			newInstance('ImageLabel', {
-				Image = 'rbxassetid://7072718362',
+			newInstance("ImageLabel", {
+				Image = "rbxassetid://7072718362",
 				ImageColor3 = library.Settings.theme.Error,
 				ImageTransparency = 1,
 				BackgroundTransparency = 1,
@@ -3069,7 +3069,7 @@ do
 		end
 		self.Instance.Parent.Sub_Modules.ContentSize.Value = self.Instance.Parent.Module.AbsoluteSize.Y
 		for i, v in pairs(self.Instance.Parent.Sub_Modules.Container:GetChildren()) do
-			if v.Name:match('_SubModule') then
+			if v.Name:match("_SubModule") then
 				self.Instance.Parent.Sub_Modules.ContentSize.Value += v.AbsoluteSize.Y + 4
 			end
 		end
@@ -3103,12 +3103,12 @@ do
 			local new_value
 			for i,v in pairs(new_config) do
 				config[i] = v
-				if string.lower(tostring(i)) == 'title' then
+				if string.lower(tostring(i)) == "title" then
 					toggle.TextLabel.Text = v
 					toggle.SearchValue.Value = v
-				elseif string.lower(tostring(i)) == 'value' then
+				elseif string.lower(tostring(i)) == "value" then
 					new_value = v
-				elseif string.lower(tostring(i)) == 'disabled' then
+				elseif string.lower(tostring(i)) == "disabled" then
 					if v then
 						Disabled()
 					else
@@ -3165,23 +3165,23 @@ do
 	function library.module:addSlider(config)
 		config = config or {}
 		local function getNum(value)
-			return tonumber((tostring(value):gsub('%D+', '')))
+			return tonumber((tostring(value):gsub("%D+", "")))
 		end
-		local min = math.clamp(getNum(betterFindIndex(config, 'Min')) or 0, 0, math.huge)
-		local max = math.clamp(getNum(betterFindIndex(config, 'Max')) or 1, min, math.huge)
-		local value = math.clamp(getNum(betterFindIndex(config, 'Value')) or 0, min, max)
+		local min = math.clamp(getNum(betterFindIndex(config, "Min")) or 0, 0, math.huge)
+		local max = math.clamp(getNum(betterFindIndex(config, "Max")) or 1, min, math.huge)
+		local value = math.clamp(getNum(betterFindIndex(config, "Value")) or 0, min, max)
 
-		local title = betterFindIndex(config, 'Title')
-		local disabled = betterFindIndex(config, 'Disabled')
+		local title = betterFindIndex(config, "Title")
+		local disabled = betterFindIndex(config, "Disabled")
 
-		local Container = newInstance('Frame', {
-			Name = 'Slider_SubModule',
+		local Container = newInstance("Frame", {
+			Name = "Slider_SubModule",
 			Parent = self.Instance.Parent.Sub_Modules.Container,
 			Size = UDim2.new(1, 0, 0, 25),
 			BackgroundTransparency = 1,
 		}, {
-			newInstance('ImageLabel', {
-				Image = 'rbxassetid://7733673345',
+			newInstance("ImageLabel", {
+				Image = "rbxassetid://7733673345",
 				ImageColor3 = library.Settings.theme.TextColor,
 				BackgroundTransparency = 1,
 				Size = UDim2.new(0, 15, 0, 15),
@@ -3200,9 +3200,9 @@ do
 		}, {
 			newInstance("TextLabel", {
 				BackgroundTransparency = 1,
-				Size = UDim2.new(0, getTextSize((title and title ~= '' and title) or 'Slider', 14, library.Settings.Elements_Font).X, 0, 14),
+				Size = UDim2.new(0, getTextSize((title and title ~= "" and title) or "Slider", 14, library.Settings.Elements_Font).X, 0, 14),
 				Font = library.Settings.Elements_Font,
-				Text = (title and title ~= '' and title) or 'Slider',
+				Text = (title and title ~= "" and title) or "Slider",
 				TextColor3 = library.Settings.theme.TextColor,
 				TextSize = 14,
 				TextXAlignment = Enum.TextXAlignment.Left,
@@ -3228,7 +3228,7 @@ do
 						BorderSizePixel = 0,
 						BackgroundColor3 = Color3.new(1, 1, 1),
 					}, {
-						newInstance('UIGradient', {
+						newInstance("UIGradient", {
 							Color = ColorSequence.new{
 								ColorSequenceKeypoint.new(0, Color3.fromRGB(40, 53, 221)),
 								ColorSequenceKeypoint.new(1, Color3.fromRGB(3, 156, 251))
@@ -3243,7 +3243,7 @@ do
 							BorderSizePixel = 0,
 							BackgroundTransparency = 1,
 						}, {
-							newInstance('UIGradient', {
+							newInstance("UIGradient", {
 								Color = ColorSequence.new{
 									ColorSequenceKeypoint.new(0, Color3.fromRGB(40, 53, 221)),
 									ColorSequenceKeypoint.new(1, Color3.fromRGB(3, 156, 251))
@@ -3253,8 +3253,8 @@ do
 					}, UDim.new(1, 0)),
 				}, UDim.new(1, 0)),
 			}),
-			newInstance('ImageLabel', {
-				Image = 'rbxassetid://7072718362',
+			newInstance("ImageLabel", {
+				Image = "rbxassetid://7072718362",
 				ImageColor3 = library.Settings.theme.Error,
 				ImageTransparency = 1,
 				BackgroundTransparency = 1,
@@ -3265,7 +3265,7 @@ do
 			}),
 			newInstance("StringValue", {
 				Name = "SearchValue",
-				Value = ((title and title ~= '' and title) or 'Slider'):gsub('<[^<>]->', ''),
+				Value = ((title and title ~= "" and title) or "Slider"):gsub("<[^<>]->", ""),
 			}),
 		})
 
@@ -3276,7 +3276,7 @@ do
 		end
 		self.Instance.Parent.Sub_Modules.ContentSize.Value = self.Instance.Parent.Module.AbsoluteSize.Y
 		for i, v in pairs(self.Instance.Parent.Sub_Modules.Container:GetChildren()) do
-			if v.Name:match('_SubModule') then
+			if v.Name:match("_SubModule") then
 				self.Instance.Parent.Sub_Modules.ContentSize.Value += v.AbsoluteSize.Y + 4
 			end
 		end
@@ -3304,27 +3304,27 @@ do
 			new_config = new_config or {}
 			local function limit_decimals(num, dec)
 				local num_to_string = tostring(num)
-				local separator = string.split(num_to_string, '.')
+				local separator = string.split(num_to_string, ".")
 				if not separator[2] then return num end
 
-				return tonumber(separator[1] .. '.' .. string.sub(separator[2], 1, dec))
+				return tonumber(separator[1] .. "." .. string.sub(separator[2], 1, dec))
 			end
 
 			local percent = math.clamp((mouse.X - slider.Slider.Bar.AbsolutePosition.X) / slider.Slider.Bar.AbsoluteSize.X, 0, 1)
 			for i,v in pairs(new_config) do
 				config[i] = v
-				if string.lower(tostring(i)) == 'title' then
+				if string.lower(tostring(i)) == "title" then
 					slider.TextLabel.Text = v
-					slider.SearchValue.Value = v:gsub('<[^<>]->', '')
-				elseif string.lower(tostring(i)) == 'min' then
+					slider.SearchValue.Value = v:gsub("<[^<>]->", "")
+				elseif string.lower(tostring(i)) == "min" then
 					min = math.clamp(getNum(v) or 0, 0, math.huge)
-				elseif string.lower(tostring(i)) == 'max' then
+				elseif string.lower(tostring(i)) == "max" then
 					max = math.clamp(getNum(v) or 0, min, math.huge)
-				elseif string.lower(tostring(i)) == 'value' then
+				elseif string.lower(tostring(i)) == "value" then
 					value = math.clamp(getNum(v) or 0, min, max)
 
 					percent = math.clamp((value - min) / (max - min), 0, 1)
-				elseif string.lower(tostring(i)) == 'disabled' then
+				elseif string.lower(tostring(i)) == "disabled" then
 					if v then
 						Disabled()
 					else
@@ -3341,7 +3341,7 @@ do
 			if table.find(CheckPoints, limit_decimals(percent, 2)) then
 				Tween(slider.Slider.Bar.Fill, { Size = UDim2.new(limit_decimals(percent, 2), 0, 1, 0) }, 0.05)
 
-				if betterFindIndex(config, "CallBack") and value ~= math.floor(min + (max - min) * percent) or betterFindIndex(new_config, 'value') then
+				if betterFindIndex(config, "CallBack") and value ~= math.floor(min + (max - min) * percent) or betterFindIndex(new_config, "value") then
 					value = math.floor(min + (max - min) * percent)
 					betterFindIndex(config, "CallBack")(value)
 				end
