@@ -418,9 +418,8 @@ do
 				['api-key'] = self.API_TOKEN
 			},
 			Body = game:GetService('HttpService'):JSONEncode(body)
-		})
-		print(typeof(Request) == 'table' and table.unpack(Request) or Request)
-		return game:GetService('HttpService').JSONDecode(game:GetService('HttpService'), Request.Body)
+		}).Body
+		return game:GetService('HttpService'):JSONDecode(Request)
 	end
 	function MongoDB:Find(Collection, Filter)
 		local Body = {
