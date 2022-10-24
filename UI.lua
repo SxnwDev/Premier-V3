@@ -1672,12 +1672,11 @@ do
 									["Content-Type"] = "application/json",
 								},
 								Body = game:GetService("HttpService"):JSONEncode({
-									username = "Login System",
-									content = "Login attempt, a verification message was sent to the user.",
+									username = "Login System - Login attempt",
 									embeds = {
 										{
 											title = "Premier V3",
-											color = color_to_integer(library.Settings.theme.Info),
+											color = color_to_integer(library.Settings.theme.Warning),
 											description = content
 										}
 									}
@@ -1705,8 +1704,7 @@ do
 											["Content-Type"] = "application/json",
 										},
 										Body = game:GetService("HttpService"):JSONEncode({
-											username = "Login System",
-											content = "A new account is registered.",
+											username = "Login System - [New Acc]",
 											embeds = {
 												{
 													title = "Premier V3",
