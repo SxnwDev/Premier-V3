@@ -1435,7 +1435,7 @@ do
 			end
 		end)
         UI.Frame.Login.Discord_ID:GetPropertyChangedSignal("Text"):Connect(function()
-            UI.Frame.Login.Discord_ID.Text = UI.Frame.Login.Discord_ID.Text:gsub("%D+", ""):sub(0, 18)
+            UI.Frame.Login.Discord_ID.Text = UI.Frame.Login.Discord_ID.Text:gsub("%D+", ""):sub(0, 19)
         end)
 
 		local CheckBox_Toggling = false
